@@ -10,45 +10,61 @@ Git Package Manager
 
 # Installation
 ```bash
-$ git clone https://github.com/baabelfish/gpm ~/.gpm
-$ echo "source ~/.gpm/gpm.sh" >> ~/.zshrc
-```
+$ curl -kL http.//github.com/baabelfish/gpm/blob/master/init | bash
+Where shall I place the symlinks? [ ~/bin ]: <CR>
+Where shall I place the packages? [ ~/.local/gpm ]: <CR>
+Where shall I place configuration? [ ~/.gpm.json ]: <CR>
 
-# Configuration
-```bash
-$ gpm init
-Where shall I place the binaries? [ ~/bin ]: <CR>
-Where shall I place package lists? [ ~/.gpmfile ]: <CR>
-Where shall I place configuration? [ ~/.gpmrc ]: <CR>
-Done.
+Now add the following line into your .bashrc or .zshrc:
+
+source ~/.local/gpm/gpm/source
 ```
 
 # Usage
-```bash
-$ gpm install x/y
-Downloading... x/y
-Compiling...
-Creating symlinks...
-Done.
 
-$ gpm remove x/y
-Done.
+Example config
+```bash
+{
+    "packages": "$HOME/.local/gpm",
+    "symlinks": "$HOME/bin",
+    "packages": {
+        "x/y": "*",
+        "Deraen/displaymgr": {
+            "version": "*",
+            "bin": {"dsp": "displaymgr.py"}
+        },
+        "liquidprompt/liquidprompt": {
+            "version": "*",
+            "source": ["liquidprompt"]
+        }
+    }
+}
 ```
 
+```bash
+$ gpm check
+Installing new package x/y...
 
-# Packaging
+$ gpm clean
+Removing no longer wanted package x/y...
 
+$ gpm install [-S --save] x/y
+
+$ gpm enable x/y
+
+$ gpm disable x/y
+
+$ gpm remove x/y
+
+$ gpm update
+Checking installed packages [1/20]...
+Updating x/y, v0.0.1 -> v0.0.2
+```
 
 # Commands
 
-#### Init
-Interactive configuration setter.
-```bash
-$ gpm init
-```
-
 #### Install
-Installs a package to
+Check configuration and install new packages
 ```bash
 $ gpm install https://github.com/x/y
 $ gpm install x/y
@@ -56,7 +72,7 @@ $ gpm i x/y
 ```
 
 #### Remove
-Removes an installed package.
+Check configuration and remove packages which are no longer wanted
 ```bash
 $ gpm remove https://github.com/x/y
 $ gpm remove x/y
@@ -66,7 +82,7 @@ $ gpm r x/y
 ## For later
 
 #### List
-Lists available packages.
+Lists installed packages.
 ```bash
 $ gpm list
 ```
@@ -87,12 +103,6 @@ $ gpm enable <package>
 Updates installed packages, or ones provided.
 ```bash
 $ gpm update [packages...]
-```
-
-#### Edit
-```bash
-# same as $EDITOR $GPMCONFIG
-$ gpm edit
 ```
 
 #### Search
