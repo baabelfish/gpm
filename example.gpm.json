@@ -1,0 +1,14 @@
+{
+    "packages_path": "$HOME/.local/gpm",
+    "symlinks_path": "$HOME/bin",
+    "packages": {
+        "x/y": "*",
+        "Deraen/displaymgr": {
+            "version": "~0.0.1",
+            "bin": {"dsp": "displaymgr.py"}
+        },
+        "liquidprompt/liquidprompt": {
+            "source": ["liquidprompt"]
+        }
+    }
+}
