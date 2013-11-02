@@ -1,7 +1,7 @@
-gpm
+TPM
 ===
 
-Git Package Manager
+The Package Manager
 
 # Goal
 - Portable over linux distributions (possibly OS X)
@@ -11,7 +11,7 @@ Git Package Manager
 
 # Installation
 ```bash
-bash <(curl -kL https://raw.github.com/baabelfish/gpm/master/init)
+bash <(curl -kL https://raw.github.com/baabelfish/tpm/master/init)
 ```
 
 # Usage
@@ -19,7 +19,7 @@ bash <(curl -kL https://raw.github.com/baabelfish/gpm/master/init)
 Example config
 ```bash
 {
-    "packages": "$HOME/.local/gpm",
+    "packages": "$HOME/.local/tpm",
     "symlinks": "$HOME/bin",
     "packages": {
         "x/y": "*",
@@ -35,9 +35,9 @@ Example config
 ```
 
 ```bash
-$ gpm install x/y
-$ gpm remove x/y
-$ gpm update
+$ tpm install x/y
+$ tpm remove x/y
+$ tpm update
 Updated x/y, v0.0.1 -> v0.0.2
 Checking installed packages [2/20]...
 ```
@@ -47,17 +47,17 @@ Checking installed packages [2/20]...
 #### Install
 Check configuration and install new packages
 ```bash
-$ gpm install https://github.com/x/y
-$ gpm install x/y
-$ gpm install # Install uninstalled packages
+$ tpm install https://github.com/x/y
+$ tpm install x/y
+$ tpm install # Install uninstalled packages
 ```
 
 #### Remove
 Check configuration and remove packages which are no longer wanted
 ```bash
-$ gpm remove https://github.com/x/y
-$ gpm remove x/y
-$ gpm remove # Remove packages which are no longer listed on config
+$ tpm remove https://github.com/x/y
+$ tpm remove x/y
+$ tpm remove # Remove packages which are no longer listed on config
 ```
 
 ## For later
@@ -65,23 +65,23 @@ $ gpm remove # Remove packages which are no longer listed on config
 #### List
 Lists installed packages
 ```bash
-$ gpm list
+$ tpm list
 ```
 
 #### Disable
 Disables an installed package. (Deletes symlink)
 ```bash
-$ gpm disable <package>
+$ tpm disable <package>
 ```
 
 #### Enable
 Enables a disabled package. (Creates symlink)
 ```bash
-$ gpm enable <package>
+$ tpm enable <package>
 ```
 
 #### Update
 Updates installed packages, or ones provided.
 ```bash
-$ gpm update [packages...]
+$ tpm update [packages...]
 ```

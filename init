@@ -7,9 +7,9 @@ YELLOW="[38;05;222m"
 default='\033[0m'
 bold='\033[1m'
 
-GPM_SYMLINKS="$HOME/bin"
-GPM_PACKAGES="$HOME/.local/gpm"
-GPM_CONFIG="$HOME/.gpm.json"
+TPM_SYMLINKS="$HOME/bin"
+TPM_PACKAGES="$HOME/.local/tpm"
+TPM_CONFIG="$HOME/.tpm.json"
 
 print_warned_if_exists() {
     [[ ! -e $1 ]] && echo -ne "${GREEN}" || echo -ne "${ORANGE}"
@@ -17,48 +17,48 @@ print_warned_if_exists() {
 }
 
 clear
-echo -e "${GREEN}Welcome to GPM${default}"
+echo -e "${GREEN}Welcome to TPM${default}"
 echo ""
 
-echo -en "Where shall I place the symlinks? [ ${BLUE}$GPM_SYMLINKS${default} ]: "
-read IN_GPM_SYMLINKS
+echo -en "Where shall I place the symlinks? [ ${BLUE}$TPM_SYMLINKS${default} ]: "
+read IN_TPM_SYMLINKS
 
-echo -en "Where shall I place the packages? [ ${BLUE}$GPM_PACKAGES${default} ]: "
-read IN_GPM_PACKAGES
+echo -en "Where shall I place the packages? [ ${BLUE}$TPM_PACKAGES${default} ]: "
+read IN_TPM_PACKAGES
 
-echo -en "Where shall I place configuration? [ ${BLUE}$GPM_CONFIG${default} ]: "
-read IN_GPM_CONFIG
+echo -en "Where shall I place configuration? [ ${BLUE}$TPM_CONFIG${default} ]: "
+read IN_TPM_CONFIG
 
-[[ ! -z $IN_GPM_SYMLINKS ]] && GPM_SYMLINKS=$IN_GPM_SYMLINKS
-[[ ! -z $IN_GPM_CONFIG ]]   && GPM_CONFIG=$IN_GPM_CONFIG
-[[ ! -z $IN_GPM_PACKAGES ]] && GPM_PACKAGES=$IN_GPM_PACKAGES
+[[ ! -z $IN_TPM_SYMLINKS ]] && TPM_SYMLINKS=$IN_TPM_SYMLINKS
+[[ ! -z $IN_TPM_CONFIG ]]   && TPM_CONFIG=$IN_TPM_CONFIG
+[[ ! -z $IN_TPM_PACKAGES ]] && TPM_PACKAGES=$IN_TPM_PACKAGES
 
 echo -e ""
 
 echo -en "Symlinks: "
-print_warned_if_exists $GPM_SYMLINKS
+print_warned_if_exists $TPM_SYMLINKS
 echo -en "Packages: "
-print_warned_if_exists $GPM_PACKAGES
+print_warned_if_exists $TPM_PACKAGES
 echo -en "Config:   "
-print_warned_if_exists $GPM_CONFIG
+print_warned_if_exists $TPM_CONFIG
 
 # Initialize folders
-mkdir -p $GPM_SYMLINKS
-mkdir -p $GPM_PACKAGES
-touch $GPM_CONFIG
+mkdir -p $TPM_SYMLINKS
+mkdir -p $TPM_PACKAGES
+touch $TPM_CONFIG
 
-# Fetch gpm
-[[ ! -e $GPM_PACKAGES/gpm ]] && echo "" && git clone https://github.com/baabelfish/gpm.git $GPM_PACKAGES/gpm
+# Fetch tpm
+[[ ! -e $TPM_PACKAGES/tpm ]] && echo "" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
 
 # Configure
-echo "PATH=$GPM_SYMLINKS:$PATH" >> $GPM_PACKAGES/config
-echo "export GPM_SYMLINKS=$GPM_SYMLINKS" > $GPM_PACKAGES/config
-echo "export GPM_PACKAGES=$GPM_PACKAGES" >> $GPM_PACKAGES/config
-echo "export GPM_CONFIG=$GPM_CONFIG" >> $GPM_PACKAGES/config
+echo "PATH=$TPM_SYMLINKS:$PATH" >> $TPM_PACKAGES/config
+echo "export TPM_SYMLINKS=$TPM_SYMLINKS" > $TPM_PACKAGES/config
+echo "export TPM_PACKAGES=$TPM_PACKAGES" >> $TPM_PACKAGES/config
+echo "export TPM_CONFIG=$TPM_CONFIG" >> $TPM_PACKAGES/config
 
-# Add symlink to gpm
-ln -s $GPM_PACKAGES/gpm/gpm $GPM_SYMLINKS/gpm
+# Add symlink to tpm
+ln -s $TPM_PACKAGES/tpm/tpm $TPM_SYMLINKS/tpm
 
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"
-echo -e "source $GPM_PACKAGES/source"
+echo -e "source $TPM_PACKAGES/source"
