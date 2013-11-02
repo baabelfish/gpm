@@ -1,19 +1,151 @@
 #!/bin/bash
+source ./helpers.sh
+
+IFS=$'\n'
+
+COMMAND=''
+PACKAGES=()
+PARAM_NOCOLOR=0
+PARAM_NOCONFIRM=0
+PARAM_QUIET=0
+PARAM_VERBOSE=0
+
 printHelp() {
     echo "\
 Usage: tpm [option] <command>
 
-command := install [packages] |
-           update [packages]  |
-           remove [packages]  |
+command := disable [packages] |
            enable [packages]  |
-           disable [packages] |
+           history [packages] |
+           install [packages] |
            list [packages]    |
+           remove [packages]  |
            search [packages]  |
-           remove [packages]
+           update [packages]  |
 
 option := --help | --nocolor | --noconfirm | --quiet | --verbose
 "
+exit 1
 }
 
-[[ -z $1 ]] && printHelp && exit 1
+[[ -z $1 ]] && printHelp
+
+setCommand() {
+    if [[ ! -z $COMMAND ]]; then
+        PACKAGES=("${PACKAGES[@]}" "$C")
+    else
+        COMMAND=$1
+    fi
+}
+
+commandDisable() {
+    echo "UNDER CONSTRUCTION: commandDisable"
+}
+
+commandEnable() {
+    echo "UNDER CONSTRUCTION: commandEnable"
+}
+
+commandHistory() {
+    echo "UNDER CONSTRUCTION: commandHistory"
+}
+
+commandInstall() {
+    echo "UNDER CONSTRUCTION: commandInstall"
+}
+
+commandList() {
+    echo "UNDER CONSTRUCTION: commandList"
+}
+
+commandRemove() {
+    echo "UNDER CONSTRUCTION: commandRemove"
+}
+
+commandSearch() {
+    echo "UNDER CONSTRUCTION: commandSearch"
+}
+
+commandUpdate() {
+    echo "UNDER CONSTRUCTION: commandUpdate"
+}
+
+
+for C in ${*}; do
+    case $C in
+        'disable')
+            setCommand         'disable'
+            ;;
+        'enable')
+            setCommand         'enable'
+            ;;
+        'history')
+            setCommand         'history'
+            ;;
+        'install')
+            setCommand         'install'
+            ;;
+        'list')
+            setCommand         'list'
+            ;;
+        'remove')
+            setCommand         'remove'
+            ;;
+        'search')
+            setCommand         'search'
+            ;;
+        'update')
+            setCommand         'update'
+            ;;
+        '--help')
+            printHelp
+            exit 1
+            ;;
+        '--nocolor')
+            PARAM_NOCOLOR=1
+            ;;
+        '--noconfirm')
+            PARAM_NOCONFIRM=1
+            ;;
+        '--quiet')
+            PARAM_QUIET=1
+            ;;
+        '--verbose')
+            PARAM_VERBOSE=1
+            ;;
+        *)
+            PACKAGES=("${PACKAGES[@]}" "$C")
+            ;;
+    esac
+done
+
+case $COMMAND in
+    'disable')
+        commandDisable
+        ;;
+    'enable')
+        commandEnable
+        ;;
+    'history')
+        commandHistory
+        ;;
+    'install')
+        commandInstall
+        ;;
+    'list')
+        commandList
+        ;;
+    'remove')
+        commandRemove
+        ;;
+    'search')
+        commandSearch
+        ;;
+    'update')
+        commandUpdate
+        ;;
+    *)
+        echo "Invalid command"
+        return 1
+        ;;
+esac
