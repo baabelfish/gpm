@@ -1,0 +1,46 @@
+#!/bin/bash
+source ./helpers.sh
+GPM_SYMLINKS="$HOME/bin"
+GPM_PACKAGES="$HOME/.local/gpm"
+GPM_CONFIG="$HOME/.gpm.json"
+
+print_warned_if_exists() {
+    [[ ! -e $1 ]] && echo -ne "${C_SUCCESS}" || echo -ne "${C_WARNING}"
+    echo -e $1${default}
+}
+
+echo -e "${C_HEADER}Welcome to GPM${default}"
+
+echo -en "Where shall I place the symlinks? [ ${C_DEFAULTPARAM}$GPM_SYMLINKS${default} ]: "
+read IN_GPM_SYMLINKS
+
+echo -en "Where shall I place the packages? [ ${C_DEFAULTPARAM}$GPM_PACKAGES${default} ]: "
+read IN_GPM_PACKAGES
+
+echo -en "Where shall I place configuration? [ ${C_DEFAULTPARAM}$GPM_CONFIG${default} ]: "
+read IN_GPM_CONFIG
+
+[[ ! -z $IN_GPM_SYMLINKS ]] && GPM_SYMLINKS=$IN_GPM_SYMLINKS
+[[ ! -z $IN_GPM_CONFIG ]]   && GPM_CONFIG=$IN_GPM_CONFIG
+[[ ! -z $IN_GPM_PACKAGES ]] && GPM_PACKAGES=$IN_GPM_PACKAGES
+
+echo -e ""
+
+echo -en "Symlinks: "
+print_warned_if_exists $GPM_SYMLINKS
+
+echo -en "Packages: "
+print_warned_if_exists $GPM_PACKAGES
+
+echo -en "Config:   "
+print_warned_if_exists $GPM_CONFIG
+
+mkdir -p $GPM_SYMLINKS
+mkdir -p $GPM_PACKAGES
+touch $GPM_CONFIG
+
+[[ ! -e $GPM_PACKAGES/gpm ]] && echo "" && git clone https://github.com/baabelfish/gpm.git $GPM_PACKAGES/gpm
+
+echo -e ""
+echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"
+echo -e "source $HOME/.local/gpm/gpm/source"
