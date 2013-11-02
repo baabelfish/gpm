@@ -44,9 +44,13 @@ touch $GPM_CONFIG
 [[ ! -e $GPM_PACKAGES/gpm ]] && echo "" && git clone https://github.com/baabelfish/gpm.git $GPM_PACKAGES/gpm
 
 # Configure
-echo "export GPM_SYMLINKS=$GPM_SYMLINKS" > $GPM_PACKAGES/gpm/config
-echo "export GPM_PACKAGES=$GPM_PACKAGES" >> $GPM_PACKAGES/gpm/config
-echo "export GPM_CONFIG=$GPM_CONFIG" >> $GPM_PACKAGES/gpm/config
+echo "PATH=$GPM_SYMLINKS:$PATH" >> $GPM_PACKAGES/config
+echo "export GPM_SYMLINKS=$GPM_SYMLINKS" > $GPM_PACKAGES/config
+echo "export GPM_PACKAGES=$GPM_PACKAGES" >> $GPM_PACKAGES/config
+echo "export GPM_CONFIG=$GPM_CONFIG" >> $GPM_PACKAGES/config
+
+# Add symlink to gpm
+ln -s $GPM_PACKAGES/gpm/gpm $GPM_SYMLINKS/gpm
 
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"
