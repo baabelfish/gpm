@@ -9,9 +9,31 @@ Git Package Manager
 - Tab completion for bash/zsh
 
 # Installation
-
+```bash
+$ git clone https://github.com/baabelfish/gpm ~/.gpm
+$ echo "source ~/.gpm/gpm.sh" >> ~/.zshrc
+```
 
 # Configuration
+```bash
+$ gpm init
+Where shall I place the binaries? [ ~/bin ]: <CR>
+Where shall I place package lists? [ ~/.gpmfile ]: <CR>
+Where shall I place configuration? [ ~/.gpmrc ]: <CR>
+Done.
+```
+
+# Usage
+```bash
+$ gpm install x/y
+Downloading... x/y
+Compiling...
+Creating symlinks...
+Done.
+
+$ gpm remove x/y
+Done.
+```
 
 
 # Packaging
