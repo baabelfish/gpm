@@ -1,0 +1,19 @@
+#!/bin/bash
+printHelp() {
+    echo "\
+Usage: gpm [option] <command>
+
+command := install [packages] |
+           update [packages]  |
+           remove [packages]  |
+           enable [packages]  |
+           disable [packages] |
+           list [packages]    |
+           search [packages]  |
+           remove [packages]
+
+option := --help | --nocolor | --noconfirm | --quiet | --verbose
+"
+}
+
+[[ -z $1 ]] && printHelp && exit 1
