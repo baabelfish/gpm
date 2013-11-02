@@ -11,14 +11,7 @@ Git Package Manager
 
 # Installation
 ```bash
-$ bash <(curl -kL https://raw.github.com/baabelfish/gpm/master/init)
-Where shall I place the symlinks? [ ~/bin ]: <CR>
-Where shall I place the packages? [ ~/.local/gpm ]: <CR>
-Where shall I place configuration? [ ~/.gpm.json ]: <CR>
-
-Now add the following line into your .bashrc or .zshrc:
-
-source ~/.local/gpm/gpm/source
+bash <(curl -kL https://raw.github.com/baabelfish/gpm/master/init)
 ```
 
 # Usage
