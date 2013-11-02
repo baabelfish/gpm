@@ -73,46 +73,22 @@ commandUpdate() {
 
 for C in ${*}; do
     case $C in
-        'disable')
-            setCommand         'disable'
-            ;;
-        'enable')
-            setCommand         'enable'
-            ;;
-        'history')
-            setCommand         'history'
-            ;;
-        'install')
-            setCommand         'install'
-            ;;
-        'list')
-            setCommand         'list'
-            ;;
-        'remove')
-            setCommand         'remove'
-            ;;
-        'search')
-            setCommand         'search'
-            ;;
-        'update')
-            setCommand         'update'
-            ;;
+        'disable') setCommand 'disable' ;;
+        'enable')  setCommand 'enable' ;;
+        'history') setCommand 'history' ;;
+        'install') setCommand 'install' ;;
+        'list')    setCommand 'list' ;;
+        'remove')  setCommand 'remove' ;;
+        'search')  setCommand 'search' ;;
+        'update')  setCommand 'update' ;;
         '--help')
             printHelp
             exit 1
             ;;
-        '--nocolor')
-            PARAM_NOCOLOR=1
-            ;;
-        '--noconfirm')
-            PARAM_NOCONFIRM=1
-            ;;
-        '--quiet')
-            PARAM_QUIET=1
-            ;;
-        '--verbose')
-            PARAM_VERBOSE=1
-            ;;
+        '--nocolor')   PARAM_NOCOLOR=1 ;;
+        '--noconfirm') PARAM_NOCONFIRM=1 ;;
+        '--quiet')     PARAM_QUIET=1 ;;
+        '--verbose')   PARAM_VERBOSE=1 ;;
         *)
             PACKAGES=("${PACKAGES[@]}" "$C")
             ;;
@@ -120,30 +96,14 @@ for C in ${*}; do
 done
 
 case $COMMAND in
-    'disable')
-        commandDisable
-        ;;
-    'enable')
-        commandEnable
-        ;;
-    'history')
-        commandHistory
-        ;;
-    'install')
-        commandInstall
-        ;;
-    'list')
-        commandList
-        ;;
-    'remove')
-        commandRemove
-        ;;
-    'search')
-        commandSearch
-        ;;
-    'update')
-        commandUpdate
-        ;;
+    'disable') commandDisable ;;
+    'enable')  commandEnable ;;
+    'history') commandHistory ;;
+    'install') commandInstall ;;
+    'list')    commandList ;;
+    'remove')  commandRemove ;;
+    'search')  commandSearch ;;
+    'update')  commandUpdate ;;
     *)
         echo "Invalid command"
         return 1
