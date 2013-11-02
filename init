@@ -11,6 +11,7 @@ print_warned_if_exists() {
 
 clear
 echo -e "${C_HEADER}Welcome to GPM${default}"
+echo ""
 
 echo -en "Where shall I place the symlinks? [ ${C_DEFAULTPARAM}$GPM_SYMLINKS${default} ]: "
 read IN_GPM_SYMLINKS
