@@ -30,19 +30,24 @@ echo -e ""
 
 echo -en "Symlinks: "
 print_warned_if_exists $GPM_SYMLINKS
-
 echo -en "Packages: "
 print_warned_if_exists $GPM_PACKAGES
-
 echo -en "Config:   "
 print_warned_if_exists $GPM_CONFIG
 
+# Initialize folders
 mkdir -p $GPM_SYMLINKS
 mkdir -p $GPM_PACKAGES
 touch $GPM_CONFIG
 
+# Fetch gpm
 [[ ! -e $GPM_PACKAGES/gpm ]] && echo "" && git clone https://github.com/baabelfish/gpm.git $GPM_PACKAGES/gpm
+
+# Configure
+echo "export GPM_SYMLINKS=$GPM_SYMLINKS" > $GPM_PACKAGES/gpm/config
+echo "export GPM_PACKAGES=$GPM_PACKAGES" >> $GPM_PACKAGES/gpm/config
+echo "export GPM_CONFIG=$GPM_CONFIG" >> $GPM_PACKAGES/gpm/config
 
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"
-echo -e "source $HOME/.local/gpm/gpm/source"
+echo -e "source $GPM_PACKAGES/source"

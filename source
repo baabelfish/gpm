@@ -1,4 +1,3 @@
 #!/bin/bash
-# export GPM_SYMLINKS=
-# export GPM_PACKAGES=
-# export GPM_CONFIG=
+GPMDIR=$(cd $(dirname "$0"); pwd)
+source "$GPMDIR/config"
