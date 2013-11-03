@@ -7,6 +7,7 @@ The Package Manager, because we need more package managers.
 - Portable over linux distributions (possibly OS X)
 - No need for sudo
 - Only dependences are bash/zsh and git
+  - and [jq](http://stedolan.github.io/jq/), for now...
 - Tab completion for bash/zsh
 
 # Installation
@@ -19,17 +20,13 @@ $ bash <(curl -kL https://raw.github.com/baabelfish/tpm/master/init)
 Example config
 ```bash
 {
-    "packages": "$HOME/.local/tpm",
-    "symlinks": "$HOME/bin",
-    "packages": {
-        "x/y": "*",
-        "Deraen/displaymgr": {
-            "version": "~0.0.1",
-            "bin": {"dsp": "displaymgr.py"}
-        },
-        "liquidprompt/liquidprompt": {
-            "source": ["liquidprompt"]
-        }
+    "x/y": "*",
+    "Deraen/displaymgr": {
+        "version": "~0.0.1",
+        "bin": {"dsp": "displaymgr.py"}
+    },
+    "liquidprompt/liquidprompt": {
+        "source": ["liquidprompt"]
     }
 }
 ```
