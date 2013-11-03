@@ -1,3 +1,0 @@
-[submodule "deps/JSON.sh"]
-	path = deps/JSON.sh
-	url = https://github.com/dominictarr/JSON.sh.git
