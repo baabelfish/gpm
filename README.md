@@ -7,6 +7,7 @@ The Package Manager, because we need more package managers.
 - Portable over linux distributions (possibly OS X)
 - No need for sudo
 - Only dependences are bash/zsh and git
+  - and [jq](http://stedolan.github.io/jq/), for now...
 - Tab completion for bash/zsh
 
 # Installation
