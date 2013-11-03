@@ -1,7 +1,7 @@
 TPM
 ===
 
-The Package Manager
+The Package Manager, because we need more package managers.
 
 # Goal
 - Portable over linux distributions (possibly OS X)
