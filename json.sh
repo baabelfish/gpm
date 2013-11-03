@@ -1,7 +1,7 @@
 #!/bin/bash
 IFS=$'\n'
 
-# $ = File name
+# $1 = File name
 # Return package objects separated by newlines
 getPackages() {
     local i
