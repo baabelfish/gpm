@@ -51,7 +51,7 @@ getBinaries() {
         local NAMES=$(echo ${1} | jq ".bin | keys")
         for (( i = 0; i < $LEN; i++ )); do
             local NAME=$(echo ${NAMES} | jq -r ".[${i}]")
-            echo $NAME	$(echo ${1} | jq -r ".bin[\"${NAME}\"]")
+            echo $NAME$'\t'$(echo ${1} | jq -r ".bin[\"${NAME}\"]")
         done
     fi
 }
