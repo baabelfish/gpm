@@ -55,10 +55,11 @@ echo "export TPM_SYMLINKS=$TPM_SYMLINKS" > $TPM_PACKAGES/.config
 echo "export TPM_PACKAGES=$TPM_PACKAGES" >> $TPM_PACKAGES/.config
 echo "export TPM_CONFIG=$TPM_CONFIG" >> $TPM_PACKAGES/.config
 echo 'export PATH=$TPM_SYMLINKS:$PATH' >> $TPM_PACKAGES/.config
+echo "source tpm/source" >> $TPM_PACKAGES/.config
 
 # Add symlink to tpm
 ln -s $TPM_PACKAGES/tpm/tpm $TPM_SYMLINKS/tpm
 
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"
-echo -e "source $TPM_PACKAGES/source"
+echo -e "source $TPM_PACKAGES/.config"
