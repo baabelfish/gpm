@@ -50,12 +50,25 @@ commandHistory() {
     echo "UNDER CONSTRUCTION: commandHistory"
 }
 
+commandInfo() {
+    if [[ ${#PACKAGES[@]} -ne 1 ]]; then
+        echo "You must provide one package name"
+    else
+        cd $TPM_PACKAGES/$i
+        git log
+    fi
+}
+
 commandInstall() {
     echo "UNDER CONSTRUCTION: commandInstall"
 }
 
 commandList() {
-    echo "UNDER CONSTRUCTION: commandList"
+    PACKAGES=($(ls $TPM_PACKAGES))
+    for i in ${PACKAGES[@]}; do
+        cd $TPM_PACKAGES/$i
+        echo -e "${C_PACKAGE_NAME}$i${default}    (${C_PACKAGE_UPDATED}updated${default}: $(git log -1|grep '^Date'|cut -f2- -d':'|sed 's/^ *//g'))"
+    done
 }
 
 commandRemove() {
@@ -76,6 +89,7 @@ for C in ${*}; do
         'disable') setCommand 'disable' ;;
         'enable')  setCommand 'enable' ;;
         'history') setCommand 'history' ;;
+        'info')    setCommand 'info' ;;
         'install') setCommand 'install' ;;
         'list')    setCommand 'list' ;;
         'remove')  setCommand 'remove' ;;
@@ -99,6 +113,7 @@ case $COMMAND in
     'disable') commandDisable ;;
     'enable')  commandEnable ;;
     'history') commandHistory ;;
+    'info')    commandInfo ;;
     'install') commandInstall ;;
     'list')    commandList ;;
     'remove')  commandRemove ;;
@@ -106,6 +121,6 @@ case $COMMAND in
     'update')  commandUpdate ;;
     *)
         echo "Invalid command"
-        return 1
+        exit 1
         ;;
 esac
