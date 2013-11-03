@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./helpers.sh
+source $TPM_PACKAGES/tpm/helpers.sh
 
 IFS=$'\n'
 
