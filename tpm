@@ -1,5 +1,9 @@
 #!/bin/bash
-source $TPM_PACKAGES/tpm/helpers.sh
+source ./helpers.sh
+source ./git.sh
+source ./json.sh
+# source $TPM_PACKAGES/tpm/helpers.sh
+# source $TPM_PACKAGES/tpm/git.sh
 
 IFS=$'\n'
 
@@ -15,13 +19,13 @@ printHelp() {
 Usage: tpm [option] <command>
 
 command := disable [packages] |
-           enable [packages]  |
-           history [packages] |
+           enable  [packages] |
+           info    [packages] |
            install [packages] |
-           list [packages]    |
-           remove [packages]  |
-           search [packages]  |
-           update [packages]  |
+           list    [packages] |
+           remove  [packages] |
+           search  [packages] |
+           update  [packages] |
 
 option := --help | --nocolor | --noconfirm | --quiet | --verbose
 "
@@ -50,20 +54,24 @@ commandInfo() {
     if [[ ${#PACKAGES[@]} -ne 1 ]]; then
         echo "You must provide one package name"
     else
-        cd $TPM_PACKAGES/$i
-        git log
+        infoOne $1
     fi
 }
 
 commandInstall() {
-    echo "UNDER CONSTRUCTION: commandInstall"
+    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
+        installConfig
+    else
+        for i in ${PACKAGES[@]}; do
+            installOne $i
+        done
+    fi
 }
 
 commandList() {
     PACKAGES=($(ls $TPM_PACKAGES))
     for i in ${PACKAGES[@]}; do
-        cd $TPM_PACKAGES/$i
-        echo -e "${C_PACKAGE_NAME}$i${default}    (${C_PACKAGE_UPDATED}updated${default}: $(git log -1|grep '^Date'|cut -f2- -d':'|sed 's/^ *//g'))"
+        listOne $i
     done
 }
 
@@ -71,12 +79,7 @@ commandRemove() {
     # TODO Remove symlinks
     # TODO Remove all not in tmp.json file
     for i in ${PACKAGES[@]}; do
-        if [[ -d "$TPM_PACKAGES/$i" ]]; then
-            rm -rf "$TPM_PACKAGES/$i"
-            echo -e "${C_REMOVING}Removed${default}: ${bold}$i${default}"
-        else
-            echo -e "${C_ERROR}${bold}No such package${default}: ${bold}$i"
-        fi
+        removeOne $i
     done
 }
 
@@ -88,9 +91,7 @@ commandUpdate() {
     # TODO Clean output
     PACKAGES=($(ls $TPM_PACKAGES))
     for i in ${PACKAGES[@]}; do
-        cd $TPM_PACKAGES/$i
-        git submodule update --init --recursive
-        git pull
+        updateOne $i
     done
 }
 

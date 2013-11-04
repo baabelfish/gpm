@@ -1,5 +1,4 @@
 {
-    "x/y": "*",
     "Deraen/displaymgr": {
         "version": "~0.0.1",
         "bin": {"dsp": "displaymgr.py"}

@@ -20,13 +20,13 @@ getPackages() {
 # $1 = Package Object
 # Returns a string
 getName() {
-    echo $(echo ${1} | jq ".name")
+    echo $(echo ${1} | jq ".name") | tr -d '"'
 }
 
 # $1 = Package Object
 # Returns a string
 getVersion() {
-    echo $(echo ${1} | jq "if .version != null then .version else \"*\" end")
+    echo "$(echo ${1} | jq "if .version != null then .version else \"*\" end")"
 }
 
 # $1 = Package Object
