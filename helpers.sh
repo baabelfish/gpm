@@ -103,6 +103,7 @@ C_PACKAGE_UPDATED=${green}
 C_REMOVING=${ORANGE}${bold}
 
 S_INSTALLING="Installing "
+S_DONE="...${GREEN}done${default}"
 S_BUILDING="Building${default}..."
 S_SOURCING="Sourcing${default}..."
 S_LINKING="Linking${default}..."

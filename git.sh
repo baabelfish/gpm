@@ -34,9 +34,12 @@ removeOne() {
 }
 
 updateOne() {
-    cd $TPM_PACKAGES/$1
-    git submodule update --init --recursive
-    git pull
+    cd "$1"
+    local NAME=$(echo $1 | rev | cut -f1 -d '/' | rev)
+    echo -n "$NAME"
+    git submodule update --init --recursive --quiet 2> /dev/null
+    git pull --quiet 2> /dev/null
+    echo -e "${S_DONE}"
 }
 
 infoOne() {

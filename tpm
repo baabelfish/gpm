@@ -87,7 +87,7 @@ commandSearch() {
 
 commandUpdate() {
     # TODO Clean output
-    PACKAGES=($(ls $TPM_PACKAGES))
+    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -type d | tail -n +2))
     for i in ${PACKAGES[@]}; do
         updateOne $i
     done
