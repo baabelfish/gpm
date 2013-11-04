@@ -24,7 +24,7 @@ removeOne() {
     if [[ -d "$TPM_PACKAGES/$1" ]]; then
         local BINARIES=($(cat "$TPM_PACKAGES/${1}_binaries"))
         for i in ${BINARIES[@]}; do
-            rm "$i"
+            rm -f "${i}"
         done
         rm -rf "$TPM_PACKAGES/$1"
         rm -f "$TPM_PACKAGES/${1}_source"
@@ -100,7 +100,7 @@ installConfig() {
             local BIN_TO=$(echo $b | cut -f1 -d $'\t')
             local BIN_FROM=$(echo $b | cut -f2 -d $'\t')
             ln -s $TPM_PACKAGES/${NAME}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
-            echo "$TPM_SYMLINKS/${BIN_TO}" > "$BINARY"
+            echo "$TPM_SYMLINKS/${BIN_TO}" >> "$BINARY"
         done
         [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
 
