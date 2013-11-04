@@ -21,6 +21,7 @@ listOne() {
 removeOne() {
     if [[ -d "$TPM_PACKAGES/$1" ]]; then
         rm -rf "$TPM_PACKAGES/$1"
+        rm -f "$TPM_PACKAGES/${1}_source"
         echo -e "${C_REMOVING}Removed${default}: ${bold}$1${default}"
     else
         echo -e "${C_ERROR}${bold}No such package${default}: ${bold}$1"
@@ -45,14 +46,21 @@ installOne() {
 installConfig() {
     PACKAGES=($(getPackages $TPM_CONFIG))
     for i in ${PACKAGES[@]}; do
+        # Package info
         local URL=$(echo $(githubify "$(getName $i)") | tr -d '"')
         local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
+        local SOURCE="$TPM_PACKAGES/${NAME}_source"
 
-        # echo $(getVersion $i) | tr -d '"'
-        # echo $(getSources $i) | tr -d '"'
+        # Handle sourcing
+        echo -n "" > "$SOURCE"
+        SOURCES=($(echo $(getSources $i) | tr -d '"'))
+        for s in ${SOURCES[@]}; do
+            echo "source $TPM_PACKAGES/$NAME/$s" > "$SOURCE"
+        done
 
-        touch "$TPM_PACKAGES/${NAME}_source"
-        touch "$TPM_PACKAGES/${NAME}_info"
+        # Clone repo
         git clone "$URL" $TPM_PACKAGES/$NAME
+
+        # TODO Write install info
     done
 }
