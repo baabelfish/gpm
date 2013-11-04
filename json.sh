@@ -20,26 +20,26 @@ getPackages() {
 # $1 = Package Object
 # Returns a string
 getName() {
-    echo $(echo ${1} | jq ".name")
+    echo $(echo ${1} | jq -r ".name")
 }
 
 # $1 = Package Object
 # Returns a string
 getVersion() {
-    echo $(echo ${1} | jq "if .version != null then .version else \"*\" end")
+    echo $(echo ${1} | jq -r "if .version != null then .version else \"*\" end")
 }
 
 # $1 = Package Object
 # Returns a build command string
 getBuild() {
-    echo $(echo ${1} | jq ".build")
+    echo $(echo ${1} | jq -r ".build")
 }
 
 # $1 = Package Object
 # Returns strings, separated by newlines
 getSources() {
     local i
-    local LEN=$(echo ${1} | jq ".source | length")
+    local LEN=$(echo ${1} | jq -r ".source | length")
     if [[ $LEN -gt 0 ]]; then
         for (( i = 0; i < $LEN; i++ )); do
             echo $(echo ${1} | jq -r ".source[${i}]")
@@ -52,7 +52,7 @@ getSources() {
 # and all these pairs separated by newlines
 getBinaries() {
     local i
-    local LEN=$(echo ${1} | jq ".bin | length")
+    local LEN=$(echo ${1} | jq -r ".bin | length")
     if [[ $LEN -gt 0 ]]; then
         local NAMES=$(echo ${1} | jq ".bin | keys")
         for (( i = 0; i < $LEN; i++ )); do
