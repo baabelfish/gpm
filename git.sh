@@ -15,6 +15,39 @@ githubify() {
     fi
 }
 
+auxLink() {
+    echo -ne "${S_LINKING}"
+    echo -n "" > "$BINARY"
+    BINARIES=($(getBinaries $i))
+    for b in ${BINARIES[@]}; do
+        local BIN_TO=$(echo $b | cut -f1 -d $'\t')
+        local BIN_FROM=$(echo $b | cut -f2 -d $'\t')
+        ln -s $TPM_PACKAGES/${NAME}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
+        echo "$TPM_SYMLINKS/${BIN_TO}" >> "$BINARY"
+    done
+    [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+}
+
+auxSource() {
+    echo -ne "${S_SOURCING}"
+    echo -n "" > "$SOURCE"
+    SOURCES=($(getSources $1))
+    for s in ${SOURCES[@]}; do
+        echo "source $TPM_PACKAGES/$NAME/$s" > "$SOURCE"
+    done
+    [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+}
+
+auxBuild() {
+        local BUILDCOMMAND="$(getBuild $i)"
+        if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
+            echo -ne "${S_BUILDING}"
+            cd "$TPM_PACKAGES/$NAME"
+            eval "$BUILDCOMMAND" > /dev/null
+        fi
+        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+}
+
 listOne() {
     cd $TPM_PACKAGES/$1
     echo -e "${C_PACKAGE_NAME}$1${default}    (${C_PACKAGE_UPDATED}updated${default}: $(git log -1|grep '^Date'|cut -f2- -d':'|sed 's/^ *//g'))"
@@ -75,34 +108,13 @@ installConfig() {
         git clone --quiet "$URL" $TPM_PACKAGES/$NAME
 
         # Run buildcommand
-        local BUILDCOMMAND="$(getBuild $i)"
-        if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
-            echo -ne "${S_BUILDING}"
-            cd "$TPM_PACKAGES/$NAME"
-            eval "$BUILDCOMMAND" > /dev/null
-        fi
-        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+        auxBuild $i
 
         # Handle sourcing
-        echo -ne "${S_SOURCING}"
-        echo -n "" > "$SOURCE"
-        SOURCES=($(getSources $i))
-        for s in ${SOURCES[@]}; do
-            echo "source $TPM_PACKAGES/$NAME/$s" > "$SOURCE"
-        done
-        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+        auxSource $i
 
         # Handle binaries
-        echo -ne "${S_LINKING}"
-        echo -n "" > "$BINARY"
-        BINARIES=($(getBinaries $i))
-        for b in ${BINARIES[@]}; do
-            local BIN_TO=$(echo $b | cut -f1 -d $'\t')
-            local BIN_FROM=$(echo $b | cut -f2 -d $'\t')
-            ln -s $TPM_PACKAGES/${NAME}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
-            echo "$TPM_SYMLINKS/${BIN_TO}" >> "$BINARY"
-        done
-        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+        auxLink $i
 
         # TODO Write install info
         echo -e "${S_SUCCESS}${default}"
