@@ -1,9 +1,10 @@
 #!/bin/bash
-source ./helpers.sh
-source ./git.sh
-source ./json.sh
-# source $TPM_PACKAGES/tpm/helpers.sh
-# source $TPM_PACKAGES/tpm/git.sh
+# source ./helpers.sh
+# source ./git.sh
+# source ./json.sh
+source $TPM_PACKAGES/tpm/helpers.sh
+source $TPM_PACKAGES/tpm/git.sh
+source $TPM_PACKAGES/tpm/json.sh
 
 IFS=$'\n'
 
