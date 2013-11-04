@@ -2,6 +2,8 @@
 source $TPM_PACKAGES/tpm/helpers.sh
 source $TPM_PACKAGES/tpm/json.sh
 
+IFS=$'\n'
+
 # $1 - url or github suffix
 # Convert url to github form
 githubify() {
@@ -72,12 +74,6 @@ installConfig() {
         echo -ne "${S_CLONING}"
         git clone --quiet "$URL" $TPM_PACKAGES/$NAME
 
-        # Change version
-        # local VERSION="$(echo $(getVersion $i) | tr -d '"')"
-        # if [[ ! -z "$VERSION" ]] && [[ "$VERSION" != "null" ]]; then
-
-        # elif
-
         # Run buildcommand
         local BUILDCOMMAND="$(echo $(getBuild $i) | tr -d '"')"
         if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
@@ -99,10 +95,10 @@ installConfig() {
         # Handle binaries
         echo -ne "${S_LINKING}"
         echo -n "" > "$BINARY"
-        BINARIES=($(echo $(getBinaries $i) | tr -d '"'))
+        BINARIES=($(getBinaries $i))
         for b in ${BINARIES[@]}; do
-            local BIN_TO=$(echo $b | cut -f1 -d'	')
-            local BIN_FROM=$(echo $b | cut -f2 -d'	')
+            local BIN_TO=$(echo $b | cut -f1 -d $'\t')
+            local BIN_FROM=$(echo $b | cut -f2 -d $'\t')
             ln -s $TPM_PACKAGES/${NAME}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
             echo "$TPM_SYMLINKS/${BIN_TO}" > "$BINARY"
         done
