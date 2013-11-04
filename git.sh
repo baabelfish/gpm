@@ -5,7 +5,7 @@ source $TPM_PACKAGES/tpm/json.sh
 # $1 - url or github suffix
 # Convert url to github form
 githubify() {
-    local regex='^http'
+    local regex='^http|^git:'
     if [[ $1 =~ $regex ]]; then
         echo "$1"
     else
