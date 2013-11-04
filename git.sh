@@ -15,6 +15,10 @@ githubify() {
     fi
 }
 
+getBasename() {
+    echo $(echo "$1" | rev | cut -f1 -d '/' | rev)
+}
+
 auxLink() {
     echo -ne "${S_LINKING}"
     echo -n "" > "$BINARY"
@@ -49,8 +53,8 @@ auxBuild() {
 }
 
 listOne() {
-    cd $TPM_PACKAGES/$1
-    echo -e "${C_PACKAGE_NAME}$1${default}    (${C_PACKAGE_UPDATED}updated${default}: $(git log -1|grep '^Date'|cut -f2- -d':'|sed 's/^ *//g'))"
+    cd $1
+    echo -e "${C_PACKAGE_NAME}$(getBasename $1)${default} (${C_PACKAGE_UPDATED}updated${default}: $(git log -1|grep '^Date'|cut -f2- -d':'|sed 's/^ *//g'))"
 }
 
 removeOne() {
