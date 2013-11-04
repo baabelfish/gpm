@@ -57,7 +57,7 @@ installConfig() {
     PACKAGES=($(getPackages $TPM_CONFIG))
     for i in ${PACKAGES[@]}; do
         # Package info
-        local URL=$(echo $(githubify "$(getName $i | tr -d '"')") | tr -d '"')
+        local URL=$(githubify $(getName $i))
         local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
 
         local SOURCE="$TPM_PACKAGES/${NAME}_source"
@@ -75,7 +75,7 @@ installConfig() {
         git clone --quiet "$URL" $TPM_PACKAGES/$NAME
 
         # Run buildcommand
-        local BUILDCOMMAND="$(echo $(getBuild $i) | tr -d '"')"
+        local BUILDCOMMAND="$(getBuild $i)"
         if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
             echo -ne "${S_BUILDING}"
             cd "$TPM_PACKAGES/$NAME"
@@ -86,7 +86,7 @@ installConfig() {
         # Handle sourcing
         echo -ne "${S_SOURCING}"
         echo -n "" > "$SOURCE"
-        SOURCES=($(echo $(getSources $i) | tr -d '"'))
+        SOURCES=($(getSources $i))
         for s in ${SOURCES[@]}; do
             echo "source $TPM_PACKAGES/$NAME/$s" > "$SOURCE"
         done
