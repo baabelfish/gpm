@@ -66,7 +66,6 @@ installConfig() {
             continue
         fi
 
-        cd "$TPM_PACKAGES/$NAME"
         echo -ne "${C_PACKAGE_NAME}$NAME${default}: "
 
         # Clone repo
@@ -76,13 +75,14 @@ installConfig() {
         # Change version
         # local VERSION="$(echo $(getVersion $i) | tr -d '"')"
         # if [[ ! -z "$VERSION" ]] && [[ "$VERSION" != "null" ]]; then
-        #     git checkout feature/${VERSION}
+
         # elif
 
         # Run buildcommand
         local BUILDCOMMAND="$(echo $(getBuild $i) | tr -d '"')"
         if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
             echo -ne "${S_BUILDING}"
+            cd "$TPM_PACKAGES/$NAME"
             eval "$BUILDCOMMAND" > /dev/null
         fi
         [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
