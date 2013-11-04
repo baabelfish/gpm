@@ -6,18 +6,24 @@ The Package Manager, because we need more package managers.
 # Goal
 - Portable over linux distributions (possibly OS X)
 - No need for sudo
-- Only dependences are bash/zsh and git
-  - and [jq](http://stedolan.github.io/jq/), for now...
 - Tab completion for bash/zsh
+- Only dependences are bash/zsh and git
+  - ...and [jq](http://stedolan.github.io/jq/), for now...
 
 # Installation
+Run installation script:
 ```bash
 $ bash <(curl -kL https://raw.github.com/baabelfish/tpm/master/init)
 ```
 
-# Usage
+NOTE: Remember to add the line it provides to your ``~/.zshrc`` or ``~/.bashrc``.
 
-Example config
+# Usage
+- Create a configuration file
+- Run ``tpm install``
+- Restart shell (to get sourced packages working)
+
+Example ``~/.tpm.json``:
 ```bash
 {
     "git://code.i3wm.org/i3": {
@@ -41,14 +47,6 @@ Example config
         "source": ["liquidprompt"]
     }
 }
-```
-
-```bash
-$ tpm install x/y
-$ tpm remove x/y
-$ tpm update
-Updated x/y, v0.0.1 -> v0.0.2
-Checking installed packages [2/20]...
 ```
 
 # Commands
@@ -80,7 +78,7 @@ $ tpm update # Updates all installed packages
 #### Info
 Shows git log of the package.
 ```bash
-$ tpm list <package>
+$ tpm info <package>
 ```
 
 #### List
