@@ -20,7 +20,6 @@ getBasename() {
 }
 
 auxLink() {
-    echo -ne "${S_LINKING}"
     echo -n "" > "$BINARY"
     BINARIES=($(getBinaries $i))
     for b in ${BINARIES[@]}; do
@@ -33,7 +32,6 @@ auxLink() {
 }
 
 auxSource() {
-    echo -ne "${S_SOURCING}"
     echo -n "" > "$SOURCE"
     SOURCES=($(getSources $1))
     for s in ${SOURCES[@]}; do
@@ -45,9 +43,12 @@ auxSource() {
 auxBuild() {
         local BUILDCOMMAND="$(getBuild $i)"
         if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
-            echo -ne "${S_BUILDING}"
             cd "$TPM_PACKAGES/$NAME"
-            eval "$BUILDCOMMAND" > /dev/null
+            if [[ $PARAM_VERBOSE -eq 0 ]]; then
+                eval "$BUILDCOMMAND" > /dev/null
+            else
+                eval "$BUILDCOMMAND"
+            fi
         fi
         [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
 }
@@ -75,10 +76,15 @@ removeOne() {
 updateOne() {
     cd "$1"
     local NAME=$(echo $1 | rev | cut -f1 -d '/' | rev)
-    echo -n "$NAME"
-    git submodule update --init --recursive --quiet 2> /dev/null
-    git pull --quiet 2> /dev/null
-    echo -e "${S_DONE}"
+    echo -en "${bold}$NAME${default}: "
+    if [[ $PARAM_VERBOSE -eq 0 ]]; then
+        git submodule update --init --recursive --quiet
+        git pull --quiet 2> /dev/null
+        echo -e "${S_DONE}"
+    else
+        git submodule update --init --recursive
+        git pull
+    fi
 }
 
 infoOne() {
@@ -91,7 +97,9 @@ installOne() {
 }
 
 installConfig() {
-    PACKAGES=($(getPackages $TPM_CONFIG))
+    [[ $PARAM_VERBOSE -eq 0 ]] && local GITPARAMS="--quiet"
+
+    local PACKAGES=($(getPackages $TPM_CONFIG))
     for i in ${PACKAGES[@]}; do
         # Package info
         local URL=$(githubify $(getName $i))
@@ -105,22 +113,23 @@ installConfig() {
             continue
         fi
 
-        echo -ne "${C_PACKAGE_NAME}$NAME${default}: "
+        # TODO change these for the love of god
+        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${C_PACKAGE_NAME}$NAME${default}: " || echo -e "${C_PACKAGE_NAME}$NAME${default}: "
 
-        # Clone repo
-        echo -ne "${S_CLONING}"
-        git clone --quiet "$URL" $TPM_PACKAGES/$NAME
+        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_CLONING}" || echo -e "${SV_CLONING}"
+        git clone ${GITPARAMS} "$URL" $TPM_PACKAGES/$NAME
 
-        # Run buildcommand
+        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_BUILDING}" || echo -e "${SV_BUILDING}"
         auxBuild $i
 
-        # Handle sourcing
+        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_SOURCING}" || echo -e "${SV_SOURCING}"
         auxSource $i
 
-        # Handle binaries
+        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_LINKING}" || echo -e "${SV_LINKING}"
         auxLink $i
 
         # TODO Write install info
         echo -e "${S_SUCCESS}${default}"
+        [[ $PARAM_VERBOSE -eq 1 ]] && echo ""
     done
 }
