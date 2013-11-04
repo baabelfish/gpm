@@ -74,10 +74,10 @@ installConfig() {
         git clone --quiet "$URL" $TPM_PACKAGES/$NAME
 
         # Change version
-        local VERSION="$(echo $(getVersion $i) | tr -d '"')"
-        if [[ ! -z "$VERSION" ]] && [[ "$VERSION" != "null" ]]; then
-            git checkout feature/${VERSION}
-        elif
+        # local VERSION="$(echo $(getVersion $i) | tr -d '"')"
+        # if [[ ! -z "$VERSION" ]] && [[ "$VERSION" != "null" ]]; then
+        #     git checkout feature/${VERSION}
+        # elif
 
         # Run buildcommand
         local BUILDCOMMAND="$(echo $(getBuild $i) | tr -d '"')"
