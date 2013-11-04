@@ -27,7 +27,7 @@ Example ``~/.tpm.json``:
 ```bash
 {
     "git://code.i3wm.org/i3": {
-        "bin": [{ 
+        "bin": { 
             "tpmi3": "i3",
             "tpmi3bar": "i3bar",
             "tpmi3-config-wizard": "i3-config-wizard/i3-config-wizard",
@@ -40,7 +40,7 @@ Example ``~/.tpm.json``:
             "tpmi3-sensible-editor": "i3-sensible-editor",
             "tpmi3-sensible-pager": "i3-sensible-pager",
             "tpmi3-sensible-terminal": "i3-sensible-terminal"
-        }],
+        },
         "build": "make"
     },
     "nojhan/liquidprompt": {
