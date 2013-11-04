@@ -74,7 +74,7 @@ installConfig() {
 
         # Run buildcommand
         local BUILDCOMMAND="$(echo $(getBuild $i) | tr -d '"')"
-        if [[ ! -z "$BUILDCOMMAND" ]]; then
+        if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
             echo -ne "${S_BUILDING}"
             cd "$TPM_PACKAGES/$NAME"
             eval "$BUILDCOMMAND" > /dev/null
