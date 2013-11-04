@@ -3,7 +3,7 @@ GOTERROR=0
 [[ -z $TPM_PACKAGES ]] && echo -n "\$TPM_PACKAGES" && GOTERROR=1
 [[ -z $TPM_SYMLINKS ]] && echo -n "\$TPM_SYMLINKS" && GOTERROR=1
 [[ -z $TPM_CONFIG ]] && echo -n "\$TPM_CONFIG" && GOTERROR=1
-[[ $GOTERROR -eq 1 ]] && echo " is not set. Maybe something went wrong with the installation? :(" && exit 1
+[[ $GOTERROR -eq 1 ]] && echo " is not set. Did you source the \$TPM_PACKAGES/.config-file?" && exit 1
 
 source $TPM_PACKAGES/tpm/helpers.sh
 source $TPM_PACKAGES/tpm/git.sh
