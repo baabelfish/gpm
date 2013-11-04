@@ -55,10 +55,16 @@ installConfig() {
     PACKAGES=($(getPackages $TPM_CONFIG))
     for i in ${PACKAGES[@]}; do
         # Package info
-        local URL=$(echo $(githubify "$(getName $i)") | tr -d '"')
+        local URL=$(echo $(githubify "$(getName $i | tr -d '"')") | tr -d '"')
         local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
+
         local SOURCE="$TPM_PACKAGES/${NAME}_source"
         local BINARY="$TPM_PACKAGES/${NAME}_binaries"
+
+        # Don't touch existing
+        if [[ -d "$TPM_PACKAGES/${NAME}" ]]; then
+            continue
+        fi
 
         echo -ne "${C_PACKAGE_NAME}$NAME${default}: "
 
@@ -97,6 +103,6 @@ installConfig() {
         [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
 
         # TODO Write install info
-        echo -e "${S_SUCCESS}"
+        echo -e "${S_SUCCESS}${default}"
     done
 }
