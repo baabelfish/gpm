@@ -101,3 +101,11 @@ C_SUCCESS=${GREEN}
 C_PACKAGE_NAME=${bold}
 C_PACKAGE_UPDATED=${green}
 C_REMOVING=${ORANGE}${bold}
+
+S_INSTALLING="Installing "
+S_BUILDING="Building${default}..."
+S_SOURCING="Sourcing${default}..."
+S_LINKING="Linking${default}..."
+S_CLONING="Cloning${default}..."
+S_SUCCESS="${GREEN}Success"
+S_FAILURE="${RED}Failure"

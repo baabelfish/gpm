@@ -20,8 +20,13 @@ listOne() {
 
 removeOne() {
     if [[ -d "$TPM_PACKAGES/$1" ]]; then
+        local BINARIES=($(cat "$TPM_PACKAGES/${1}_binaries"))
+        for i in ${BINARIES[@]}; do
+            rm "$i"
+        done
         rm -rf "$TPM_PACKAGES/$1"
         rm -f "$TPM_PACKAGES/${1}_source"
+        rm -f "$TPM_PACKAGES/${1}_binaries"
         echo -e "${C_REMOVING}Removed${default}: ${bold}$1${default}"
     else
         echo -e "${C_ERROR}${bold}No such package${default}: ${bold}$1"
@@ -50,17 +55,45 @@ installConfig() {
         local URL=$(echo $(githubify "$(getName $i)") | tr -d '"')
         local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
         local SOURCE="$TPM_PACKAGES/${NAME}_source"
+        local BINARY="$TPM_PACKAGES/${NAME}_binaries"
+
+        echo -ne "${C_PACKAGE_NAME}$NAME${default}: "
+
+        # Clone repo
+        echo -ne "${S_CLONING}"
+        git clone --quiet "$URL" $TPM_PACKAGES/$NAME
+
+        # Run buildcommand
+        local BUILDCOMMAND="$(echo $(getBuild $i) | tr -d '"')"
+        if [[ ! -z "$BUILDCOMMAND" ]]; then
+            echo -ne "${S_BUILDING}"
+            cd "$TPM_PACKAGES/$NAME"
+            eval "$BUILDCOMMAND" > /dev/null
+        fi
+        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
 
         # Handle sourcing
+        echo -ne "${S_SOURCING}"
         echo -n "" > "$SOURCE"
         SOURCES=($(echo $(getSources $i) | tr -d '"'))
         for s in ${SOURCES[@]}; do
             echo "source $TPM_PACKAGES/$NAME/$s" > "$SOURCE"
         done
+        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
 
-        # Clone repo
-        git clone "$URL" $TPM_PACKAGES/$NAME
+        # Handle binaries
+        echo -ne "${S_LINKING}"
+        echo -n "" > "$BINARY"
+        BINARIES=($(echo $(getBinaries $i) | tr -d '"'))
+        for b in ${BINARIES[@]}; do
+            local BIN_TO=$(echo $b | cut -f1 -d'	')
+            local BIN_FROM=$(echo $b | cut -f2 -d'	')
+            ln -s $TPM_PACKAGES/${NAME}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
+            echo "$TPM_SYMLINKS/${BIN_TO}" > "$BINARY"
+        done
+        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
 
         # TODO Write install info
+        echo -e "${S_SUCCESS}"
     done
 }

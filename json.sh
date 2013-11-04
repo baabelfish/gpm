@@ -30,6 +30,12 @@ getVersion() {
 }
 
 # $1 = Package Object
+# Returns a build command string
+getBuild() {
+    echo $(echo ${1} | jq ".build")
+}
+
+# $1 = Package Object
 # Returns strings, separated by newlines
 getSources() {
     local i

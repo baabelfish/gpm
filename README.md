@@ -20,12 +20,11 @@ $ bash <(curl -kL https://raw.github.com/baabelfish/tpm/master/init)
 Example config
 ```bash
 {
-    "x/y": "*",
     "Deraen/displaymgr": {
         "version": "~0.0.1",
         "bin": {"dsp": "displaymgr.py"}
     },
-    "liquidprompt/liquidprompt": {
+    "nojhan/liquidprompt": {
         "source": ["liquidprompt"]
     }
 }
