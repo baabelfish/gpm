@@ -53,7 +53,6 @@ mkdir -p $TPM_PACKAGES/.aux
 # Fetch tpm
 [[ ! -e $TPM_PACKAGES/tpm ]] && echo "" && echo -e "Fetching ${bold}tpm${default}" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
     
-
 # Configure
 echo "export TPM_SYMLINKS=$TPM_SYMLINKS" > $TPM_PACKAGES/.config
 echo "export TPM_PACKAGES=$TPM_PACKAGES" >> $TPM_PACKAGES/.config
@@ -78,7 +77,7 @@ if [[ $jqinput == "y" ]] || [[ $jqinput == "Y" ]]; then
 fi
 
 # Copying default ~/.tpm.json
-[[ ! -e $TPM_CONFIG ]] && cp $TPM_PACKAGES/tpm/default.tpm.json $TPM_CONFIG
+[[ ! -e $TPM_CONFIG ]] && cat $TPM_PACKAGES/tpm/default.tpm.json > $TPM_CONFIG
 
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"

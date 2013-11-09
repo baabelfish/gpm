@@ -1,3 +1,5 @@
 {
-    "baabelfish/tpm": {}
+    "packages": {
+        "baabelfish/tpm": {}
+    }
 }
