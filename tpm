@@ -96,7 +96,7 @@ commandInstall() {
 }
 
 commandList() {
-    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -type d | tail -n +2 | sort))
+    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -not -name '.*' -type d | tail -n +2 | sort))
     for i in ${PACKAGES[@]}; do
         listOne $i
     done
