@@ -78,6 +78,9 @@ if [[ $jqinput == "y" ]] || [[ $jqinput == "Y" ]]; then
     chmod +x $TPM_PACKAGES/.aux/jq
 fi
 
+# Copying default ~/.tpm.json
+[[ ! -e $TPM_CONFIG ]] && cp $TPM_PACKAGES/tpm/default.tpm.json $TPM_CONFIG
+
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"
 echo -e "source $TPM_PACKAGES/.config"
