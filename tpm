@@ -118,7 +118,7 @@ commandSearch() {
 
 commandUpdate() {
     # TODO Clean output
-    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -type d | tail -n +2))
+    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -not -name '.*' -type d | tail -n +2))
     for i in ${PACKAGES[@]}; do
         updateOne $i
     done
