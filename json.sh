@@ -5,16 +5,27 @@ IFS=$'\n'
 # Return package objects separated by newlines
 getPackages() {
     local i
-    local NAMES=$(jq keys ${1})
+    local NAMES=$(jq '.packages' ${1} | jq keys)
     local LEN=$(echo $NAMES | jq -r length)
     for (( i = 0; i < $LEN; i++ )); do
         PKG=$(echo $NAMES | jq -r .[${i}])
-
-        DATA=$(jq ".[\"$PKG\"]" ${1})
+        DATA=$(jq '.packages' ${1} | jq ".[\"$PKG\"]")
         DATA=$(echo ${DATA} | jq "if (. | type) != \"string\" then . else {version: .} end")
         DATA=$(echo ${DATA} | jq ". + {name: \"$PKG\"}")
         echo $DATA
     done
+}
+
+# $1 = Package Object
+# Returns a string
+getPreInstall() {
+    echo $(cat ${1} | jq -r ".preinstall")
+}
+
+# $1 = Package Object
+# Returns a string
+getPostInstall() {
+    echo $(cat ${1} | jq -r ".postinstall")
 }
 
 # $1 = Package Object

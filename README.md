@@ -26,25 +26,29 @@ NOTE: Remember to add the line it provides to your ``~/.zshrc`` or ``~/.bashrc``
 Example ``~/.tpm.json``:
 ```bash
 {
-    "git://code.i3wm.org/i3": {
-        "bin": { 
-            "i3": "i3",
-            "i3bar": "i3bar",
-            "i3-config-wizard": "i3-config-wizard/i3-config-wizard",
-            "i3-dmenu-desktop": "i3-dmenu-desktop",
-            "i3-dump-log": "i3-dump-log/i3-dump-log",
-            "i3-input": "i3-input/i3-input",
-            "i3-migrate-config-to-v4": "i3-migrate-config-to-v4",
-            "i3-msg": "i3-msg/i3-msg",
-            "i3-nagbar": "i3-nagbar/i3-nagbar",
-            "i3-sensible-editor": "i3-sensible-editor",
-            "i3-sensible-pager": "i3-sensible-pager",
-            "i3-sensible-terminal": "i3-sensible-terminal"
+    "preinstall": "echo \"running preinstall\"",
+    "postinstall": "echo \"running postinstall\"",
+    "packages": {
+        "git://code.i3wm.org/i3": {
+            "bin": { 
+                "i3": "i3",
+                "i3bar": "i3bar",
+                "i3-config-wizard": "i3-config-wizard/i3-config-wizard",
+                "i3-dmenu-desktop": "i3-dmenu-desktop",
+                "i3-dump-log": "i3-dump-log/i3-dump-log",
+                "i3-input": "i3-input/i3-input",
+                "i3-migrate-config-to-v4": "i3-migrate-config-to-v4",
+                "i3-msg": "i3-msg/i3-msg",
+                "i3-nagbar": "i3-nagbar/i3-nagbar",
+                "i3-sensible-editor": "i3-sensible-editor",
+                "i3-sensible-pager": "i3-sensible-pager",
+                "i3-sensible-terminal": "i3-sensible-terminal"
+            },
+            "build": "make"
         },
-        "build": "make"
-    },
-    "nojhan/liquidprompt": {
-        "source": ["liquidprompt"]
+        "nojhan/liquidprompt": {
+            "source": ["liquidprompt"]
+        }
     }
 }
 ```

@@ -63,6 +63,9 @@ commandInfo() {
 }
 
 commandInstall() {
+    local PREINSTALL="$(getPreInstall $TPM_CONFIG)"
+    local POSTINSTALL="$(getPostInstall $TPM_CONFIG)"
+    [[ $PREINSTALL != "null" ]] && eval $PREINSTALL
     if [[ ${#PACKAGES[@]} -eq 0 ]]; then
         installConfig
     else
@@ -70,21 +73,27 @@ commandInstall() {
             installOne $i
         done
     fi
+
+    if [[ $POSTINSTALL != "null" ]]; then
+        eval $POSTINSTALL
+    fi
 }
 
 commandList() {
-    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -type d | tail -n +2))
+    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -type d | tail -n +2 | sort))
     for i in ${PACKAGES[@]}; do
         listOne $i
     done
 }
 
 commandRemove() {
-    # TODO Remove symlinks
-    # TODO Remove all not in tmp.json file
-    for i in ${PACKAGES[@]}; do
-        removeOne $i
-    done
+    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
+        echo "To be implemented"
+    else
+        for i in ${PACKAGES[@]}; do
+            removeOne $i
+        done
+    fi
 }
 
 commandSearch() {
