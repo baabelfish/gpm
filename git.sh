@@ -133,8 +133,8 @@ installOne() {
 
 installConfig() {
     [[ $PARAM_VERBOSE -eq 0 ]] && local GITPARAMS="--quiet"
-
     local PACKAGES=($(getPackages $TPM_CONFIG))
+
     for i in ${PACKAGES[@]}; do
         local URL=$(githubify $(getName $i))
         local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
@@ -148,7 +148,13 @@ installConfig() {
         fi
 
         # TODO change these for the love of god
-        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${C_PACKAGE_NAME}$NAME${default}: " || echo -e "${C_PACKAGE_NAME}$NAME${default}: "
+        if [[ $PARAM_VERBOSE -eq 1 ]]; then
+            echo -ne "${C_SEPARATOR}== ${default}"
+            echo -ne "${C_PACKAGE_NAME}$NAME${default}"
+            echo -e "${C_SEPARATOR} =="
+        else
+            echo -ne "${C_PACKAGE_NAME}$NAME${default}: "
+        fi
 
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_CLONING}" || echo -e "${SV_CLONING}"
         git clone ${GITPARAMS} "$URL" $TPM_PACKAGES/$NAME
@@ -171,7 +177,7 @@ installConfig() {
         auxLink $i
 
         # TODO Write install info
-        echo -e "${S_SUCCESS}${default}"
+        [[ $PARAM_VERBOSE -eq 0 ]] && echo -e "${S_SUCCESS}${default}" || echo -e " -> ${SV_SUCCESS}${default}"
         [[ $PARAM_VERBOSE -eq 1 ]] && echo ""
     done
 }

@@ -1,5 +1,25 @@
 #!/bin/bash
 
+BLUE="[38;05;67m"
+CYAN='\033[1;36m'
+GREEN="[38;05;107m"
+ORANGE="[38;05;179m"
+PURPLE="[38;05;96m"
+RED="[38;05;167m"
+YELLOW="[38;05;222m"
+
+blue='\033[0;34m'
+cyan='\033[0;36m'
+default='\033[0m'
+green='\033[0;32m'
+purple='\033[0;35m'
+red='\033[0;31m'
+yellow='\033[0;33m'
+
+default='\033[0m'
+bold='\033[1m'
+underline='\033[4m'
+
 # Misc helpers
 ################################################################################
 typeset -Ag FX FG BG
@@ -40,7 +60,7 @@ draw_screenwide_with() {
     for (( i = 0; i < $WIDTH; i++ )); do
         STR=$STR$1
     done
-    echo $STR
+    echo -e $STR${default}
 }
 
 clear_rest_of_screen() {
@@ -82,26 +102,6 @@ for color in {000..$SUPPORT}; do
     BG[$color]="\e[48;5;${color}m"
 done
 
-BLUE="[38;05;67m"
-CYAN='\033[1;36m'
-GREEN="[38;05;107m"
-ORANGE="[38;05;179m"
-PURPLE="[38;05;96m"
-RED="[38;05;167m"
-YELLOW="[38;05;222m"
-
-blue='\033[0;34m'
-cyan='\033[0;36m'
-default='\033[0m'
-green='\033[0;32m'
-purple='\033[0;35m'
-red='\033[0;31m'
-yellow='\033[0;33m'
-
-default='\033[0m'
-bold='\033[1m'
-underline='\033[4m'
-
 C_HEADER=${GREEN}
 C_DEFAULTPARAM=${BLUE}
 C_ERROR=${underlined}${RED}
@@ -128,5 +128,5 @@ SV_BUILDING="Building${default}"
 SV_SOURCING="Sourcing${default}"
 SV_LINKING="Linking${default}"
 SV_CLONING="Cloning${default}"
-SV_SUCCESS="${GREEN}Success"
+SV_SUCCESS="${underline}${GREEN}Success"
 SV_FAILURE="${RED}Failure"

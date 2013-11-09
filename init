@@ -62,7 +62,7 @@ ln -s $TPM_PACKAGES/tpm/tpm $TPM_SYMLINKS/tpm
 
 # Make it compatible with itself :?
 echo "$TPM_SYMLINKS/tpm" > $TPM_PACKAGES/tpm_binaries
-echo "tpm/source" > $TPM_PACKAGES/tpm_source
+echo "" > $TPM_PACKAGES/tpm_source
 
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"

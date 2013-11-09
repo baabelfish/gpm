@@ -27,8 +27,6 @@ command := disable [packages] |
            history [packages] |
            info    [packages] |
            install [packages] |
-           list    [packages] |
-           remove  [packages] |
            search  [packages] |
            update  [packages] |
 
@@ -129,14 +127,14 @@ for C in ${*}; do
         'remove')  setCommand 'remove' ;;
         'search')  setCommand 'search' ;;
         'update')  setCommand 'update' ;;
-        '--help')
+        '-h') ;& '--help')
             printHelp
             exit 1
             ;;
-        '--nocolor')   PARAM_NOCOLOR=1 ;;
-        '--noconfirm') PARAM_NOCONFIRM=1 ;;
-        '--quiet')     PARAM_QUIET=1 ;;
-        '--verbose')   PARAM_VERBOSE=1 ;;
+        '-c') ;& '--nocolor')   PARAM_NOCOLOR=1 ;;
+        '-C') ;& '--noconfirm') PARAM_NOCONFIRM=1 ;;
+        '-q') ;& '--quiet')     PARAM_QUIET=1 ;;
+        '-v') ;& '--verbose')   PARAM_VERBOSE=1 ;;
         *)
             PACKAGES=("${PACKAGES[@]}" "$C")
             ;;
