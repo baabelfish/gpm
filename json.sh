@@ -19,31 +19,31 @@ getPackages() {
 # $1 = Package Object
 # Returns a string
 getPreInstall() {
-    echo $(cat ${1} | jq -r ".preinstall")
+    echo $(cat ${1} | jq -r "if .preinstall != null then .preinstall else \"\" end")
 }
 
 # $1 = Package Object
 # Returns a string
 getPostInstall() {
-    echo $(cat ${1} | jq -r ".postinstall")
+    echo $(cat ${1} | jq -r "if .postinstall != null then .postinstall else \"\" end")
 }
 
 # $1 = Package Object
 # Returns a string
 getName() {
-    echo $(echo ${1} | jq -r ".name")
+    echo $(echo ${1} | jq -r "if .name != null then .name else \"\" end")
 }
 
 # $1 = Package Object
 # Returns a string
 getVersion() {
-    echo $(echo ${1} | jq -r "if .version != null then .version else \"*\" end")
+    echo $(echo ${1} | jq -r "if .version != null then .version else \"\" end")
 }
 
 # $1 = Package Object
 # Returns a build command string
 getBuild() {
-    echo $(echo ${1} | jq -r ".build")
+    echo $(echo ${1} | jq -r "if .build != null then .build else \"\" end")
 }
 
 # $1 = Package Object

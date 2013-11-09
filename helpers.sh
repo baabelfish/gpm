@@ -34,6 +34,15 @@ term_width() {
     echo $(tput cols)
 }
 
+draw_screenwide_with() {
+    WIDTH=$(term_width)
+    STR=""
+    for (( i = 0; i < $WIDTH; i++ )); do
+        STR=$STR$1
+    done
+    echo $STR
+}
+
 clear_rest_of_screen() {
     WIDTH=$(term_width)
     EMPTY=""
@@ -101,6 +110,8 @@ C_SUCCESS=${GREEN}
 C_PACKAGE_NAME=${bold}
 C_PACKAGE_UPDATED=${green}
 C_REMOVING=${ORANGE}${bold}
+C_INFO_PART=${green}
+C_SEPARATOR=${GREEN}
 
 S_INSTALLING="Installing "
 S_DONE="...${GREEN}done${default}"

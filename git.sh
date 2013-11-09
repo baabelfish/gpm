@@ -19,6 +19,10 @@ getBasename() {
     echo $(echo "$1" | rev | cut -f1 -d '/' | rev)
 }
 
+getCurrentVersion() {
+    echo $(git branch | grep '^\*' | grep 'detached from' | rev | cut -f1 -d' ' | tr -d ')' | rev)
+}
+
 auxLink() {
     echo -n "" > "$BINARY"
     BINARIES=($(getBinaries $i))
@@ -87,9 +91,40 @@ updateOne() {
     fi
 }
 
-infoOne() {
+historyOne() {
     cd $TPM_PACKAGES/$1
     git log
+}
+
+infoOne() {
+    [[ ! -e "$TPM_PACKAGES/$1" ]] && echo "No such package" && exit 1
+    cd $TPM_PACKAGES/$1
+    local SOURCES=($(cat $TPM_PACKAGES/${1}_source))
+    local BINARIES=($(cat $TPM_PACKAGES/${1}_binaries))
+    local VERSION=$(getCurrentVersion)
+    [[ -z $VERSION ]] && VERSION="latest"
+
+    echo -e ${C_PACKAGE_NAME}$1${C_SEPARATOR}
+    draw_screenwide_with '='
+    echo -e "${C_INFO_PART}version${default}: $VERSION"
+    echo -e "${C_INFO_PART}location${default}: $TPM_PACKAGES/$1"
+    if [[ ${#SOURCES[@]} -gt 1 ]]; then
+        echo -e "${C_INFO_PART}sources${default}:"
+        for i in ${SOURCES[@]}; do
+            echo $i
+        done
+    fi
+    [[ ${#SOURCES[@]} -eq 1 ]] && echo -e "${C_INFO_PART}source${default}: $SOURCES"
+
+    if [[ ${#BINARIES[@]} -gt 1 ]]; then
+        echo -e "${C_INFO_PART}binaries${default}:"
+        for i in ${BINARIES[@]}; do
+            echo "  $(echo $i | rev | cut -f1 -d'/' | rev)"
+        done
+    fi
+    if [[ ${#BINARIES[@]} -eq 1 ]]; then
+        echo -e "${C_INFO_PART}binary${default}: $(echo $BINARIES | rev | cut -f1 -d'/' | rev)"
+    fi
 }
 
 installOne() {
@@ -101,12 +136,11 @@ installConfig() {
 
     local PACKAGES=($(getPackages $TPM_CONFIG))
     for i in ${PACKAGES[@]}; do
-        # Package info
         local URL=$(githubify $(getName $i))
         local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
-
         local SOURCE="$TPM_PACKAGES/${NAME}_source"
         local BINARY="$TPM_PACKAGES/${NAME}_binaries"
+        local VERSION="$(getVersion $i)"
 
         # Don't touch existing
         if [[ -d "$TPM_PACKAGES/${NAME}" ]]; then
@@ -118,6 +152,14 @@ installConfig() {
 
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_CLONING}" || echo -e "${SV_CLONING}"
         git clone ${GITPARAMS} "$URL" $TPM_PACKAGES/$NAME
+
+        if [[ ! -z $VERSION ]]; then
+            cd $TPM_PACKAGES/$NAME
+            local EVERSION=$(git tag -l $VERSION | tail -n 1)
+            if [[ ! -z $EVERSION ]]; then
+                git checkout ${GITPARAMS} tags/${EVERSION}
+            fi
+        fi
 
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_BUILDING}" || echo -e "${SV_BUILDING}"
         auxBuild $i
