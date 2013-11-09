@@ -52,7 +52,8 @@ mkdir -p $TPM_PACKAGES/.aux
 touch $TPM_CONFIG
 
 # Fetch tpm
-[[ ! -e $TPM_PACKAGES/tpm ]] && echo "" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
+[[ ! -e $TPM_PACKAGES/tpm ]] && echo "" && echo -e "Fetching ${bold}tpm${default}" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
+    
 
 # Configure
 echo "export TPM_SYMLINKS=$TPM_SYMLINKS" > $TPM_PACKAGES/.config
@@ -70,7 +71,8 @@ echo "" > $TPM_PACKAGES/tpm_source
 
 # jq installation
 if [[ $jqinput == "y" ]] || [[ $jqinput == "Y" ]]; then
-    echo "Downloading"
+    echo -e "Fetching ${bold}jq${default}"
+    [[ -e $TPM_PACKAGES/.aux/jq ]] && rm -f $TPM_PACKAGES/.aux/jq
     cd $TPM_PACKAGES/.aux
     wget http://stedolan.github.io/jq/download/linux32/jq
     chmod +x $TPM_PACKAGES/.aux/jq
