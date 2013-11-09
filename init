@@ -29,6 +29,9 @@ read IN_TPM_PACKAGES
 echo -en "Where shall I place configuration? [ ${BLUE}$TPM_CONFIG${default} ]: "
 read IN_TPM_CONFIG
 
+echo -en "Would you like me to fetch ${bold}jq${default} for you from ${bold}http://stedolan.github.io/jq/download/linux32/jq${default}? [y/N]: "
+read jqinput
+
 [[ ! -z $IN_TPM_SYMLINKS ]] && TPM_SYMLINKS=$IN_TPM_SYMLINKS
 [[ ! -z $IN_TPM_CONFIG ]]   && TPM_CONFIG=$IN_TPM_CONFIG
 [[ ! -z $IN_TPM_PACKAGES ]] && TPM_PACKAGES=$IN_TPM_PACKAGES
@@ -45,6 +48,7 @@ print_warned_if_exists $TPM_CONFIG
 # Initialize folders
 mkdir -p $TPM_SYMLINKS
 mkdir -p $TPM_PACKAGES
+mkdir -p $TPM_PACKAGES/.aux
 touch $TPM_CONFIG
 
 # Fetch tpm
@@ -63,6 +67,14 @@ ln -s $TPM_PACKAGES/tpm/tpm $TPM_SYMLINKS/tpm
 # Make it compatible with itself :?
 echo "$TPM_SYMLINKS/tpm" > $TPM_PACKAGES/tpm_binaries
 echo "" > $TPM_PACKAGES/tpm_source
+
+# jq installation
+if [[ $jqinput == "y" ]] || [[ $jqinput == "Y" ]]; then
+    echo "Downloading"
+    cd $TPM_PACKAGES/.aux
+    wget http://stedolan.github.io/jq/download/linux32/jq
+    chmod +x $TPM_PACKAGES/.aux/jq
+fi
 
 echo -e ""
 echo -e "${GREEN}Now add the following line into your ${bold}~/.bashrc${default}${GREEN} or ${bold}~/.zshrc${default}:"
