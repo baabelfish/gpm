@@ -45,7 +45,7 @@ auxSource() {
 }
 
 auxBuild() {
-        local BUILDCOMMAND="$(getBuild $i)"
+        local BUILDCOMMAND="$(parseField 'build' $i)"
         if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
             cd "$TPM_PACKAGES/$NAME"
             if [[ $PARAM_VERBOSE -eq 0 ]]; then
@@ -136,11 +136,11 @@ installConfig() {
     local PACKAGES=($(getPackages $TPM_CONFIG))
 
     for i in ${PACKAGES[@]}; do
-        local URL=$(githubify $(getName $i))
+        local URL=$(githubify $(parseField 'name' $i))
         local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
         local SOURCE="$TPM_PACKAGES/${NAME}_source"
         local BINARY="$TPM_PACKAGES/${NAME}_binaries"
-        local VERSION="$(getVersion $i)"
+        local VERSION="$(parseField 'version' $i)"
 
         # Don't touch existing
         if [[ -d "$TPM_PACKAGES/${NAME}" ]]; then

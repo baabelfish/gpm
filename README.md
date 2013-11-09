@@ -24,8 +24,9 @@ NOTE: Remember to add the line it provides to your ``~/.zshrc`` or ``~/.bashrc``
 - Restart shell (to get sourced packages working)
 
 Example ``~/.tpm.json``:
-```bash
+```json
 {
+    "verbose": true,
     "preinstall": "echo \"running preinstall\"",
     "postinstall": "echo \"running postinstall\"",
     "packages": {

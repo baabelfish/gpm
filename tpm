@@ -1,4 +1,6 @@
 #!/bin/bash
+IFS=$'\n'
+
 GOTERROR=0
 [[ -z $TPM_PACKAGES ]] && echo -n "\$TPM_PACKAGES" && GOTERROR=1
 [[ -z $TPM_SYMLINKS ]] && echo -n "\$TPM_SYMLINKS" && GOTERROR=1
@@ -9,14 +11,21 @@ source $TPM_PACKAGES/tpm/helpers.sh
 source $TPM_PACKAGES/tpm/git.sh
 source $TPM_PACKAGES/tpm/json.sh
 
-IFS=$'\n'
+isTrue() {
+    local reval=$(getField ${1} $TPM_CONFIG)
+    if [[ $reval == "1" ]] || [[ $reval == "true" ]]; then
+        echo 1
+    else
+        echo 0
+    fi
+}
 
 COMMAND=''
 PACKAGES=()
-PARAM_NOCOLOR=0
-PARAM_NOCONFIRM=0
-PARAM_QUIET=0
-PARAM_VERBOSE=0
+PARAM_NOCOLOR=$(isTrue 'nocolor')
+PARAM_NOCONFIRM=$(isTrue 'noconfirm')
+PARAM_QUIET=$(isTrue 'quiet')
+PARAM_VERBOSE=$(isTrue 'verbose')
 
 printHelp() {
     echo "\
@@ -70,8 +79,8 @@ commandInfo() {
 }
 
 commandInstall() {
-    local PREINSTALL="$(getPreInstall $TPM_CONFIG)"
-    local POSTINSTALL="$(getPostInstall $TPM_CONFIG)"
+    local PREINSTALL="$(getField 'preinstall' $TPM_CONFIG)"
+    local POSTINSTALL="$(getField 'postinstall' $TPM_CONFIG)"
     [[ ! -z $PREINSTALL ]] && eval $PREINSTALL
     if [[ ${#PACKAGES[@]} -eq 0 ]]; then
         installConfig
