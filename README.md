@@ -45,6 +45,7 @@ Example ``~/.tpm.json``:
                 "i3-sensible-pager": "i3-sensible-pager",
                 "i3-sensible-terminal": "i3-sensible-terminal"
             },
+            "version": "4.5.1",
             "build": "make"
         },
         "nojhan/liquidprompt": {
