@@ -49,7 +49,6 @@ print_warned_if_exists $TPM_CONFIG
 mkdir -p $TPM_SYMLINKS
 mkdir -p $TPM_PACKAGES
 mkdir -p $TPM_PACKAGES/.aux
-touch $TPM_CONFIG
 
 # Fetch tpm
 [[ ! -e $TPM_PACKAGES/tpm ]] && echo "" && echo -e "Fetching ${bold}tpm${default}" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
