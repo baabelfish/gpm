@@ -87,7 +87,6 @@ updateOne() {
         echo -e "${S_DONE}"
     else
         echo ""
-        draw_screenwide_with '='
         git submodule update --init --recursive
         git pull
         echo ""
