@@ -19,7 +19,7 @@ $ bash <(curl -kL https://raw.github.com/baabelfish/tpm/master/init)
 NOTE: Remember to add the line it provides to your ``~/.zshrc`` or ``~/.bashrc``.
 
 # Usage
-- Create a configuration file
+- Modify the configuration file
 - Run ``tpm install``
 - Restart shell (to get sourced packages working)
 
@@ -54,6 +54,9 @@ Example ``~/.tpm.json``:
     }
 }
 ```
+
+You shouldn't install software like i3 with this unless you know what you're
+doing. It's purpose here is to provide a more complex example.
 
 # Commands
 
