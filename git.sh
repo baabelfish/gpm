@@ -82,11 +82,11 @@ updateOne() {
     local NAME=$(echo $1 | rev | cut -f1 -d '/' | rev)
     echo -en "${bold}$NAME${default}: "
     if [[ $PARAM_VERBOSE -eq 0 ]]; then
-        echo ""
         git submodule update --init --recursive --quiet
         git pull --quiet 2> /dev/null
         echo -e "${S_DONE}"
     else
+        echo ""
         git submodule update --init --recursive
         git pull
     fi
