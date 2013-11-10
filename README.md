@@ -1,7 +1,13 @@
 TPM
 ===
 
-The Package Manager, because we need more package managers.
+The Package Manager, because we need more package managers. Seriously this tries
+to be a package manager for people who like to share scripts, configs or even
+simple programs that need building. This is great especially when using a forked
+repo, no need to package it again, user only needs to change the URL.
+
+This piece of "software" was designed (usability wise) after [npm](https://npmjs.org) and vim package manager
+[Vundle](https://github.com/gmarik/vundle).
 
 # Goal
 - Portable over linux distributions (possibly OS X)
@@ -31,6 +37,9 @@ Example ``~/.tpm.json``:
     "postinstall": "echo \"running postinstall\"",
     "packages": {
         "https://github.com/baabelfish/tpm-filemanagement": {},
+        "nojhan/liquidprompt": {
+            "source": ["liquidprompt"]
+        },
         "git://code.i3wm.org/i3": {
             "bin": { 
                 "i3": "i3",
@@ -48,9 +57,6 @@ Example ``~/.tpm.json``:
             },
             "version": "4.5.1",
             "build": "make"
-        },
-        "nojhan/liquidprompt": {
-            "source": ["liquidprompt"]
         }
     }
 }
