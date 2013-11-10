@@ -45,8 +45,8 @@ auxSource() {
 }
 
 auxBuild() {
-        local BUILDCOMMAND="$(parseField 'build' $i)"
-        if [[ ! -z "$BUILDCOMMAND" ]] && [[ "$BUILDCOMMAND" != "null" ]]; then
+        local BUILDCOMMAND="$(parseField 'build' "$1")"
+        if [[ ! -z "$BUILDCOMMAND" ]]; then
             cd "$TPM_PACKAGES/$NAME"
             if [[ $PARAM_VERBOSE -eq 0 ]]; then
                 eval "$BUILDCOMMAND" > /dev/null
