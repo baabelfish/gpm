@@ -55,7 +55,7 @@ Example ``~/.tpm.json``:
 }
 ```
 
-You shouldn't install software like i3 with this unless you know what you're
+You shouldn't install software like i3 with tpm unless you know what you're
 doing. It's purpose here is to provide a more complex example.
 
 # Commands
@@ -103,6 +103,10 @@ $ tpm list
 ```
 
 # TODO
+- `` tpm install --save <package> ``
+- Complete removal of tpm (maybe with ``tpm remove tpm``
+- List available versions and choose from them
+- More clever update
 
 #### Enable
 Enables a disabled package.
