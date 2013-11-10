@@ -84,8 +84,14 @@ $ tpm update x/y
 $ tpm update # Updates all installed packages
 ```
 
-#### Info
+#### History
 Shows git log of the package.
+```bash
+$ tpm info <package>
+```
+
+#### Info
+Shows package information. Version, etc.
 ```bash
 $ tpm info <package>
 ```
@@ -95,6 +101,8 @@ Lists installed packages, versions and date last updated.
 ```bash
 $ tpm list
 ```
+
+# TODO
 
 #### Enable
 Enables a disabled package.
