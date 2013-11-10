@@ -172,7 +172,7 @@ installConfig() {
         fi
 
         local repojson="{}"
-        [[ -e "$TPM_PACKAGES/$NAME/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$NAME/.tpm.json | jq -r ".")"
+        [[ -e "$TPM_PACKAGES/$NAME/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$NAME/.tpm.json)"
 
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_BUILDING}" || echo -e "${SV_BUILDING}"
         if [[ -z $(parseField "build" "$i") ]]; then
