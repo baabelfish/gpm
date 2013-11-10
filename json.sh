@@ -20,6 +20,20 @@ getPackages() {
 }
 
 # $1 = Field name
+# $2 = Data
+# $3 = Input JSON
+updateField() {
+    echo $(echo ${3} | $jq_bin -r ".${1} |= ${2}")
+}
+
+# $1 = Field name
+# $2 = Data
+# $3 = Input JSON
+setField() {
+    echo $(echo ${3} | $jq_bin -r ".${1} = ${2}")
+}
+
+# $1 = Field name
 # $2 = File name
 # Returns a string
 getField() {

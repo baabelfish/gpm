@@ -25,7 +25,7 @@ getCurrentVersion() {
 
 auxLink() {
     echo -n "" > "$BINARY"
-    BINARIES=($(getBinaries $i))
+    BINARIES=($(getBinaries "$1"))
     for b in ${BINARIES[@]}; do
         local BIN_TO=$(echo $b | cut -f1 -d $'\t')
         local BIN_FROM=$(echo $b | cut -f2 -d $'\t')
@@ -37,9 +37,9 @@ auxLink() {
 
 auxSource() {
     echo -n "" > "$SOURCE"
-    SOURCES=($(getSources $1))
+    SOURCES=($(getSources "$1"))
     for s in ${SOURCES[@]}; do
-        echo "source $TPM_PACKAGES/$NAME/$s" > "$SOURCE"
+        echo "source $TPM_PACKAGES/$NAME/$s" >> "$SOURCE"
     done
     [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
 }
@@ -138,11 +138,12 @@ installConfig() {
     local PACKAGES=($(getPackages $TPM_CONFIG))
 
     for i in ${PACKAGES[@]}; do
-        local URL=$(githubify $(parseField 'name' $i))
-        local NAME=$(echo $URL | rev | cut -f1 -d '/' | rev)
-        local SOURCE="$TPM_PACKAGES/${NAME}_source"
-        local BINARY="$TPM_PACKAGES/${NAME}_binaries"
-        local VERSION="$(parseField 'version' $i)"
+        URL=$(githubify $(parseField 'name' $i))
+        REPO=$(echo $URL | rev | cut -f1,2 -d '/' | rev)
+        NAME=$(echo $REPO | rev | cut -f1 -d '/' | rev)
+        SOURCE="$TPM_PACKAGES/${NAME}_source"
+        BINARY="$TPM_PACKAGES/${NAME}_binaries"
+        VERSION="$(parseField 'version' $i)"
 
         # Don't touch existing
         if [[ -d "$TPM_PACKAGES/${NAME}" ]]; then
@@ -161,6 +162,7 @@ installConfig() {
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_CLONING}" || echo -e "${SV_CLONING}"
         git clone ${GITPARAMS} "$URL" $TPM_PACKAGES/$NAME
 
+        # Set version
         if [[ ! -z $VERSION ]]; then
             cd $TPM_PACKAGES/$NAME
             local EVERSION=$(git tag -l $VERSION | tail -n 1)
@@ -169,14 +171,29 @@ installConfig() {
             fi
         fi
 
+        local repojson="{}"
+        [[ -e "$TPM_PACKAGES/$NAME/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$NAME/.tpm.json | jq -r ".")"
+
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_BUILDING}" || echo -e "${SV_BUILDING}"
-        auxBuild $i
+        if [[ -z $(parseField "build" "$i") ]]; then
+            auxBuild "$repojson"
+        else
+            auxBuild "$i"
+        fi
 
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_SOURCING}" || echo -e "${SV_SOURCING}"
-        auxSource $i
+        if [[ -z $(parseField "source" "$i") ]]; then
+            auxSource "$repojson" 
+        else
+            auxSource "$i"
+        fi
 
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_LINKING}" || echo -e "${SV_LINKING}"
-        auxLink $i
+        if [[ -z $(parseField "bin" "$i") ]]; then
+            auxLink "$repojson"
+        else
+            auxLink "$i"
+        fi
 
         # TODO Write install info
         [[ $PARAM_VERBOSE -eq 0 ]] && echo -e "${S_SUCCESS}${default}" || echo -e " -> ${SV_SUCCESS}${default}"
