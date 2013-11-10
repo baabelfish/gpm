@@ -30,6 +30,7 @@ Example ``~/.tpm.json``:
     "preinstall": "echo \"running preinstall\"",
     "postinstall": "echo \"running postinstall\"",
     "packages": {
+        "https://github.com/baabelfish/tpm-filemanagement": {},
         "git://code.i3wm.org/i3": {
             "bin": { 
                 "i3": "i3",
@@ -103,7 +104,7 @@ $ tpm list
 ```
 
 # TODO
-- `` tpm install --save <package> ``
+- persistent install `` tpm install --save <package> ``
 - Complete removal of tpm (maybe with ``tpm remove tpm``
 - List available versions and choose from them
 - More clever update
