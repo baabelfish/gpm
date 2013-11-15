@@ -110,6 +110,7 @@ $ tpm list
 ```
 
 # TODO
+- Check if build commands fails
 - persistent install `` tpm install --save <package> ``
 - Complete removal of tpm (maybe with ``tpm remove tpm``
 - List available versions and choose from them

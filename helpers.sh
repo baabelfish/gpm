@@ -22,7 +22,6 @@ underline='\033[4m'
 
 # Misc helpers
 ################################################################################
-typeset -Ag FX FG BG
 
 addSource() {
     [[ -e "$1" ]] && source "$1"
@@ -97,7 +96,7 @@ else
     SUPPORT=$1
 fi
 
-for color in {000..$SUPPORT}; do
+for (( color=000; color <= $SUPPORT; color++ )); do
     FG[$color]="\e[38;5;${color}m"
     BG[$color]="\e[48;5;${color}m"
 done
