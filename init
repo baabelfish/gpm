@@ -29,7 +29,7 @@ read IN_TPM_PACKAGES
 echo -en "Where shall I place configuration? [ ${BLUE}$TPM_CONFIG${default} ]: "
 read IN_TPM_CONFIG
 
-echo -en "Would you like me to fetch ${bold}jq${default} for you from ${bold}http://stedolan.github.io/jq/download/linux32/jq${default}? [y/N]: "
+echo -en "Would you like me to fetch ${bold}jq${default} for you from ${bold}http://stedolan.github.io/jq/download/linux{32,64}/jq${default}? [y/32/64/N]: "
 read jqinput
 
 [[ ! -z $IN_TPM_SYMLINKS ]] && TPM_SYMLINKS=$IN_TPM_SYMLINKS
@@ -52,7 +52,7 @@ mkdir -p $TPM_PACKAGES/.aux
 
 # Fetch tpm
 [[ ! -e $TPM_PACKAGES/tpm ]] && echo "" && echo -e "Fetching ${bold}tpm${default}" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
-    
+
 # Configure
 echo "export TPM_SYMLINKS=$TPM_SYMLINKS" > $TPM_PACKAGES/.config
 echo "export TPM_PACKAGES=$TPM_PACKAGES" >> $TPM_PACKAGES/.config
@@ -68,11 +68,13 @@ echo "$TPM_SYMLINKS/tpm" > $TPM_PACKAGES/tpm_binaries
 echo "" > $TPM_PACKAGES/tpm_source
 
 # jq installation
-if [[ $jqinput == "y" ]] || [[ $jqinput == "Y" ]]; then
+if [[ $jqinput == "y" ]] || [[ $jqinput == "Y" ]] || [[ $jqinput == "32" ]] || [[ $jqinput == "64" ]]; then
     echo -e "Fetching ${bold}jq${default}"
     [[ -e $TPM_PACKAGES/.aux/jq ]] && rm -f $TPM_PACKAGES/.aux/jq
     cd $TPM_PACKAGES/.aux
-    wget http://stedolan.github.io/jq/download/linux32/jq
+    ARCH=$jqinput
+    if [[ $ARCH == "y" ]] || [[ $ARCH == "Y" ]]; then ARCH="32"; fi
+    wget http://stedolan.github.io/jq/download/linux${ARCH}/jq
     chmod +x $TPM_PACKAGES/.aux/jq
 fi
 
