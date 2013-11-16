@@ -198,33 +198,33 @@ installConfig() {
     local PACKAGES=($(getPackages $TPM_CONFIG))
 
     for i in ${PACKAGES[@]}; do
-        local URL=$(githubify $(parseField 'name' $i))
-        local REPO=$(echo $URL | rev | cut -f1,2 -d '/' | rev)
-        local NAME=$(echo $REPO | rev | cut -f1 -d '/' | rev)
-        local SOURCE="$TPM_PACKAGES/${NAME}_source"
-        local BINARY="$TPM_PACKAGES/${NAME}_binaries"
+        local url=$(githubify $(parseField 'name' $i))
+        local repo=$(echo $url | rev | cut -f1,2 -d '/' | rev)
+        local name=$(echo $repo | rev | cut -f1 -d '/' | rev)
+        local SOURCE="$TPM_PACKAGES/${name}_source"
+        local BINARY="$TPM_PACKAGES/${name}_binaries"
         local VERSION="$(parseField 'version' $i)"
 
         # Don't touch existing
-        if [[ -d "$TPM_PACKAGES/${NAME}" ]]; then
+        if [[ -d "$TPM_PACKAGES/${name}" ]]; then
             continue
         fi
 
         # TODO change these for the love of god
         if [[ $PARAM_VERBOSE -eq 1 ]]; then
             echo -ne "${C_SEPARATOR}== ${default}"
-            echo -ne "${C_PACKAGE_NAME}$NAME${default}"
+            echo -ne "${C_PACKAGE_name}$name${default}"
             echo -e "${C_SEPARATOR} =="
         else
-            echo -ne "${C_PACKAGE_NAME}$NAME${default}: "
+            echo -ne "${C_PACKAGE_name}$name${default}: "
         fi
 
         echo -ne "${S_CLONING}"
-        git clone ${GITPARAMS} "$URL" $TPM_PACKAGES/$NAME
+        git clone ${GITPARAMS} "$url" $TPM_PACKAGES/$name
 
         # Set version
         if [[ ! -z $VERSION ]]; then
-            cd $TPM_PACKAGES/$NAME
+            cd $TPM_PACKAGES/$name
             local EVERSION=$(git tag -l $VERSION | tail -n 1)
             if [[ ! -z $EVERSION ]]; then
                 git checkout ${GITPARAMS} tags/${EVERSION}
@@ -232,7 +232,7 @@ installConfig() {
         fi
 
         local repojson="{}"
-        [[ -e "$TPM_PACKAGES/$NAME/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$NAME/.tpm.json)"
+        [[ -e "$TPM_PACKAGES/$name/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$name/.tpm.json)"
 
         echo -ne "${S_BUILDING}"
         auxBuild "$i" "$repojson"

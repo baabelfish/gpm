@@ -110,9 +110,8 @@ $ tpm list
 ```
 
 # TODO
-- Check if build commands fails
-- Complete removal of tpm (maybe with ``tpm remove tpm``
 - More clever update
+- Complete removal of tpm (maybe with ``tpm remove tpm``
 - persistent install `` tpm install --save <package> ``
 - Support .tar packages
 - List available versions and choose from them
