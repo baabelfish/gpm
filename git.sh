@@ -40,10 +40,7 @@ configureApplication() {
 
 recover() {
     crashed=1
-    local URL=$(githubify $(parseField 'name' $i))
-    local REPO=$(echo $URL | rev | cut -f1,2 -d '/' | rev)
-    local NAME=$(echo $REPO | rev | cut -f1 -d '/' | rev)
-    removeOne "$NAME"
+    removeOne "$package_name"
     exit 1
 }
 
@@ -71,28 +68,26 @@ auxLink() {
     if [[ -z $(parseField "bin" "$1") ]]; then
         SELECTED="$2"
     fi
-    echo -n "" > "$BINARY"
+    echo -n "" > "$package_binary"
     BINARIES=($(getBinaries "$SELECTED"))
     for b in ${BINARIES[@]}; do
         local BIN_TO=$(echo $b | cut -f1 -d $'\t')
         local BIN_FROM=$(echo $b | cut -f2 -d $'\t')
-        ln -s $TPM_PACKAGES/${NAME}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
-        echo "$TPM_SYMLINKS/${BIN_TO}" >> "$BINARY"
+        ln -s $TPM_PACKAGES/${package_name}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
+        echo "$TPM_SYMLINKS/${BIN_TO}" >> "$package_binary"
     done
-    [[ $? -ne 0 ]] && echo -ne ${S_FAILURE} && recover $1
 }
 
 auxSource() {
     local SELECTED="$1"
-    if [[ -z $(parseField "build" "$1") ]]; then
+    if [[ -z $(parseField "source" "$1") ]]; then
         SELECTED="$2"
     fi
-    echo -n "" > "$SOURCE"
+    echo -n "" > "$package_source"
     SOURCES=($(getSources "$SELECTED"))
     for s in ${SOURCES[@]}; do
-        echo "source $TPM_PACKAGES/$NAME/$s" >> "$SOURCE"
+        echo "source $TPM_PACKAGES/$package_name/$s" >> "$package_source"
     done
-    [[ $? -ne 0 ]] && echo -en ${S_FAILURE} && recover $1
 }
 
 auxBuild() {
@@ -102,11 +97,10 @@ auxBuild() {
     fi
     local BUILDCOMMAND="$(parseField 'build' "$SELECTED")"
     if [[ ! -z "$BUILDCOMMAND" ]]; then
-        cd "$TPM_PACKAGES/$NAME"
+        cd "$TPM_PACKAGES/$package_name"
         if [[ $PARAM_VERBOSE -eq 0 ]]; then
             eval "$BUILDCOMMAND" > /dev/null
         else
-            # "$BUILDCOMMAND"
             eval "$BUILDCOMMAND"
         fi
     fi
@@ -120,9 +114,8 @@ listOne() {
 
 removeOne() {
     if [[ -d "$TPM_PACKAGES/$1" ]]; then
-        local location_bin="$TPM_ACKAGES/${1}_binaries"
+        local location_bin="$TPM_PACKAGES/${1}_binaries"
         local location_source="$TPM_PACKAGES/${1}_source"
-        [[ -e $location_source ]] && rm -f $location_source
         if [[ -e $location_bin ]]; then
             local BINARIES=($(cat $location_bin))
             for i in ${BINARIES[@]}; do
@@ -130,6 +123,7 @@ removeOne() {
             done
             rm -f $location_bin
         fi
+        [[ -e $location_source ]] && rm -f $location_source
         rm -rf "$TPM_PACKAGES/$1"
         [[ $crashed -eq 0 ]] && echo -e "${C_REMOVING}Removed${default}: ${bold}$1${default}"
     else
@@ -198,41 +192,41 @@ installConfig() {
     local PACKAGES=($(getPackages $TPM_CONFIG))
 
     for i in ${PACKAGES[@]}; do
-        local url=$(githubify $(parseField 'name' $i))
-        local repo=$(echo $url | rev | cut -f1,2 -d '/' | rev)
-        local name=$(echo $repo | rev | cut -f1 -d '/' | rev)
-        local SOURCE="$TPM_PACKAGES/${name}_source"
-        local BINARY="$TPM_PACKAGES/${name}_binaries"
-        local VERSION="$(parseField 'version' $i)"
+        package_url=$(githubify $(parseField 'name' $i))
+        package_repo=$(echo $package_url | rev | cut -f1,2 -d '/' | rev)
+        package_name=$(echo $package_repo | rev | cut -f1 -d '/' | rev)
+        package_source="$TPM_PACKAGES/${package_name}_source"
+        package_binary="$TPM_PACKAGES/${package_name}_binaries"
+        package_version="$(parseField 'version' $i)"
 
         # Don't touch existing
-        if [[ -d "$TPM_PACKAGES/${name}" ]]; then
+        if [[ -d "$TPM_PACKAGES/${package_name}" ]]; then
             continue
         fi
 
         # TODO change these for the love of god
         if [[ $PARAM_VERBOSE -eq 1 ]]; then
             echo -ne "${C_SEPARATOR}== ${default}"
-            echo -ne "${C_PACKAGE_name}$name${default}"
+            echo -ne "${C_PACKAGE_name}$package_name${default}"
             echo -e "${C_SEPARATOR} =="
         else
-            echo -ne "${C_PACKAGE_name}$name${default}: "
+            echo -ne "${C_PACKAGE_name}$package_name${default}: "
         fi
 
         echo -ne "${S_CLONING}"
-        git clone ${GITPARAMS} "$url" $TPM_PACKAGES/$name
+        git clone ${GITPARAMS} "$package_url" $TPM_PACKAGES/$package_name
 
         # Set version
-        if [[ ! -z $VERSION ]]; then
-            cd $TPM_PACKAGES/$name
-            local EVERSION=$(git tag -l $VERSION | tail -n 1)
+        if [[ ! -z $package_version ]]; then
+            cd $TPM_PACKAGES/$package_name
+            local EVERSION=$(git tag -l $package_version | tail -n 1)
             if [[ ! -z $EVERSION ]]; then
                 git checkout ${GITPARAMS} tags/${EVERSION}
             fi
         fi
 
         local repojson="{}"
-        [[ -e "$TPM_PACKAGES/$name/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$name/.tpm.json)"
+        [[ -e "$TPM_PACKAGES/$package_name/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$package_name/.tpm.json)"
 
         echo -ne "${S_BUILDING}"
         auxBuild "$i" "$repojson"
