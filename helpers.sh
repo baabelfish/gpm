@@ -100,32 +100,3 @@ for (( color=000; color <= $SUPPORT; color++ )); do
     FG[$color]="\e[38;5;${color}m"
     BG[$color]="\e[48;5;${color}m"
 done
-
-C_HEADER=${GREEN}
-C_DEFAULTPARAM=${BLUE}
-C_ERROR=${underlined}${RED}
-C_WARNING=${ORANGE}
-C_SUCCESS=${GREEN}
-C_PACKAGE_NAME=${bold}
-C_PACKAGE_UPDATED=${green}
-C_REMOVING=${ORANGE}${bold}
-C_INFO_PART=${green}
-C_SEPARATOR=${GREEN}
-
-S_INSTALLING="Installing "
-S_DONE="...${GREEN}done${default}"
-S_BUILDING="Building${default}..."
-S_SOURCING="Sourcing${default}..."
-S_LINKING="Linking${default}..."
-S_CLONING="Cloning${default}..."
-S_SUCCESS="${GREEN}Success"
-S_FAILURE="${RED}Failure"
-
-SV_INSTALLING="Installing "
-SV_DONE="${GREEN}done${default}"
-SV_BUILDING="Building${default}"
-SV_SOURCING="Sourcing${default}"
-SV_LINKING="Linking${default}"
-SV_CLONING="Cloning${default}"
-SV_SUCCESS="${underline}${GREEN}Success"
-SV_FAILURE="${RED}Failure"

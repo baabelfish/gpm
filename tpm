@@ -150,6 +150,8 @@ for C in ${*}; do
     esac
 done
 
+configureApplication
+
 case $COMMAND in
     'disable') commandDisable ;;
     'enable')  commandEnable ;;

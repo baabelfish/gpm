@@ -3,6 +3,49 @@ source $TPM_PACKAGES/tpm/helpers.sh
 source $TPM_PACKAGES/tpm/json.sh
 
 IFS=$'\n'
+crashed=0
+
+configureApplication() {
+    C_HEADER=${GREEN}
+    C_DEFAULTPARAM=${BLUE}
+    C_ERROR=${underlined}${RED}
+    C_WARNING=${ORANGE}
+    C_SUCCESS=${GREEN}
+    C_PACKAGE_NAME=${bold}
+    C_PACKAGE_UPDATED=${green}
+    C_REMOVING=${ORANGE}${bold}
+    C_INFO_PART=${green}
+    C_SEPARATOR=${GREEN}
+
+    S_INSTALLING="Installing "
+    S_DONE="...${GREEN}done${default}"
+    S_BUILDING="Building${default}..."
+    S_SOURCING="Sourcing${default}..."
+    S_LINKING="Linking${default}..."
+    S_CLONING="Cloning${default}..."
+    S_SUCCESS="${GREEN}Success"
+    S_FAILURE="${RED}Failure"
+
+    if [[ $PARAM_VERBOSE -eq 1 ]]; then
+        S_INSTALLING="Installing "
+        S_DONE="${GREEN}done${default}\n"
+        S_BUILDING="Building${default}\n"
+        S_SOURCING="Sourcing${default}\n"
+        S_LINKING="Linking${default}\n"
+        S_CLONING="Cloning${default}\n"
+        S_SUCCESS="${underline}${GREEN}Success${default}\n"
+        S_FAILURE="${RED}Failure${default}\n"
+    fi
+}
+
+recover() {
+    crashed=1
+    local URL=$(githubify $(parseField 'name' $i))
+    local REPO=$(echo $URL | rev | cut -f1,2 -d '/' | rev)
+    local NAME=$(echo $REPO | rev | cut -f1 -d '/' | rev)
+    removeOne "$NAME"
+    exit 1
+}
 
 # $1 - url or github suffix
 # Convert url to github form
@@ -24,37 +67,50 @@ getCurrentVersion() {
 }
 
 auxLink() {
+    local SELECTED="$1"
+    if [[ -z $(parseField "bin" "$1") ]]; then
+        SELECTED="$2"
+    fi
     echo -n "" > "$BINARY"
-    BINARIES=($(getBinaries "$1"))
+    BINARIES=($(getBinaries "$SELECTED"))
     for b in ${BINARIES[@]}; do
         local BIN_TO=$(echo $b | cut -f1 -d $'\t')
         local BIN_FROM=$(echo $b | cut -f2 -d $'\t')
         ln -s $TPM_PACKAGES/${NAME}/${BIN_FROM} $TPM_SYMLINKS/${BIN_TO}
         echo "$TPM_SYMLINKS/${BIN_TO}" >> "$BINARY"
     done
-    [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+    [[ $? -ne 0 ]] && echo -ne ${S_FAILURE} && recover $1
 }
 
 auxSource() {
+    local SELECTED="$1"
+    if [[ -z $(parseField "build" "$1") ]]; then
+        SELECTED="$2"
+    fi
     echo -n "" > "$SOURCE"
-    SOURCES=($(getSources "$1"))
+    SOURCES=($(getSources "$SELECTED"))
     for s in ${SOURCES[@]}; do
         echo "source $TPM_PACKAGES/$NAME/$s" >> "$SOURCE"
     done
-    [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+    [[ $? -ne 0 ]] && echo -en ${S_FAILURE} && recover $1
 }
 
 auxBuild() {
-        local BUILDCOMMAND="$(parseField 'build' "$1")"
-        if [[ ! -z "$BUILDCOMMAND" ]]; then
-            cd "$TPM_PACKAGES/$NAME"
-            if [[ $PARAM_VERBOSE -eq 0 ]]; then
-                eval "$BUILDCOMMAND" > /dev/null
-            else
-                eval "$BUILDCOMMAND"
-            fi
+    local SELECTED="$1"
+    if [[ -z $(parseField "build" "$1") ]]; then
+        SELECTED="$2"
+    fi
+    local BUILDCOMMAND="$(parseField 'build' "$SELECTED")"
+    if [[ ! -z "$BUILDCOMMAND" ]]; then
+        cd "$TPM_PACKAGES/$NAME"
+        if [[ $PARAM_VERBOSE -eq 0 ]]; then
+            eval "$BUILDCOMMAND" > /dev/null
+        else
+            # "$BUILDCOMMAND"
+            eval "$BUILDCOMMAND"
         fi
-        [[ $ERR -ne 0 ]] && echo ${S_FAILURE} && return 1
+    fi
+    [[ $? -ne 0 ]] && echo -en ${S_FAILURE} && recover $1
 }
 
 listOne() {
@@ -64,16 +120,20 @@ listOne() {
 
 removeOne() {
     if [[ -d "$TPM_PACKAGES/$1" ]]; then
-        local BINARIES=($(cat "$TPM_PACKAGES/${1}_binaries"))
-        for i in ${BINARIES[@]}; do
-            rm -f "${i}"
-        done
+        local location_bin="$TPM_ACKAGES/${1}_binaries"
+        local location_source="$TPM_PACKAGES/${1}_source"
+        [[ -e $location_source ]] && rm -f $location_source
+        if [[ -e $location_bin ]]; then
+            local BINARIES=($(cat $location_bin))
+            for i in ${BINARIES[@]}; do
+                rm -f "${i}"
+            done
+            rm -f $location_bin
+        fi
         rm -rf "$TPM_PACKAGES/$1"
-        rm -f "$TPM_PACKAGES/${1}_source"
-        rm -f "$TPM_PACKAGES/${1}_binaries"
-        echo -e "${C_REMOVING}Removed${default}: ${bold}$1${default}"
+        [[ $crashed -eq 0 ]] && echo -e "${C_REMOVING}Removed${default}: ${bold}$1${default}"
     else
-        echo -e "${C_ERROR}${bold}No such package${default}: ${bold}$1"
+        [[ $crashed -eq 0 ]] && echo -e "${C_ERROR}${bold}No such package${default}: ${bold}$1"
     fi
 }
 
@@ -138,12 +198,12 @@ installConfig() {
     local PACKAGES=($(getPackages $TPM_CONFIG))
 
     for i in ${PACKAGES[@]}; do
-        URL=$(githubify $(parseField 'name' $i))
-        REPO=$(echo $URL | rev | cut -f1,2 -d '/' | rev)
-        NAME=$(echo $REPO | rev | cut -f1 -d '/' | rev)
-        SOURCE="$TPM_PACKAGES/${NAME}_source"
-        BINARY="$TPM_PACKAGES/${NAME}_binaries"
-        VERSION="$(parseField 'version' $i)"
+        local URL=$(githubify $(parseField 'name' $i))
+        local REPO=$(echo $URL | rev | cut -f1,2 -d '/' | rev)
+        local NAME=$(echo $REPO | rev | cut -f1 -d '/' | rev)
+        local SOURCE="$TPM_PACKAGES/${NAME}_source"
+        local BINARY="$TPM_PACKAGES/${NAME}_binaries"
+        local VERSION="$(parseField 'version' $i)"
 
         # Don't touch existing
         if [[ -d "$TPM_PACKAGES/${NAME}" ]]; then
@@ -159,7 +219,7 @@ installConfig() {
             echo -ne "${C_PACKAGE_NAME}$NAME${default}: "
         fi
 
-        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_CLONING}" || echo -e "${SV_CLONING}"
+        echo -ne "${S_CLONING}"
         git clone ${GITPARAMS} "$URL" $TPM_PACKAGES/$NAME
 
         # Set version
@@ -174,29 +234,16 @@ installConfig() {
         local repojson="{}"
         [[ -e "$TPM_PACKAGES/$NAME/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$NAME/.tpm.json)"
 
-        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_BUILDING}" || echo -e "${SV_BUILDING}"
-        if [[ -z $(parseField "build" "$i") ]]; then
-            auxBuild "$repojson"
-        else
-            auxBuild "$i"
-        fi
+        echo -ne "${S_BUILDING}"
+        auxBuild "$i" "$repojson"
 
-        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_SOURCING}" || echo -e "${SV_SOURCING}"
-        if [[ -z $(parseField "source" "$i") ]]; then
-            auxSource "$repojson" 
-        else
-            auxSource "$i"
-        fi
+        echo -ne "${S_SOURCING}"
+        auxSource "$i" "$repojson"
 
-        [[ $PARAM_VERBOSE -eq 0 ]] && echo -ne "${S_LINKING}" || echo -e "${SV_LINKING}"
-        if [[ -z $(parseField "bin" "$i") ]]; then
-            auxLink "$repojson"
-        else
-            auxLink "$i"
-        fi
+        echo -ne "${S_LINKING}"
+        auxLink "$i" "$repojson"
 
         # TODO Write install info
-        [[ $PARAM_VERBOSE -eq 0 ]] && echo -e "${S_SUCCESS}${default}" || echo -e " -> ${SV_SUCCESS}${default}"
-        [[ $PARAM_VERBOSE -eq 1 ]] && echo ""
+        echo -e "${S_SUCCESS}${default}"
     done
 }
