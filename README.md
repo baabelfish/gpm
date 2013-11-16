@@ -111,12 +111,12 @@ $ tpm list
 
 # TODO
 - Check if build commands fails
-- persistent install `` tpm install --save <package> ``
 - Complete removal of tpm (maybe with ``tpm remove tpm``
-- List available versions and choose from them
 - More clever update
-- Support branch names as versions
+- persistent install `` tpm install --save <package> ``
 - Support .tar packages
+- List available versions and choose from them
+- Support branch names as versions
 
 #### Enable
 Enables a disabled package.
