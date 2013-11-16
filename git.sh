@@ -38,6 +38,18 @@ configureApplication() {
     fi
 }
 
+parsePackage() {
+    package_url=$(githubify $(parseField 'name' $1))
+    package_repo=$(echo $package_url | rev | cut -f1,2 -d '/' | rev)
+    package_name=$(echo $package_repo | rev | cut -f1 -d '/' | rev)
+    package_source="$TPM_PACKAGES/${package_name}_source"
+    package_binary="$TPM_PACKAGES/${package_name}_binaries"
+    package_version="$(parseField 'version' $1)"
+}
+
+# parsePackageByName() {
+# }
+# 
 recover() {
     crashed=1
     removeOne "$package_name"
@@ -184,60 +196,57 @@ infoOne() {
 }
 
 installOne() {
-    echo $1
+    # TODO change these for the love of god
+    if [[ $PARAM_VERBOSE -eq 1 ]]; then
+        echo -ne "${C_SEPARATOR}== ${default}"
+        echo -ne "${C_PACKAGE_name}$package_name${default}"
+        echo -e "${C_SEPARATOR} =="
+    else
+        echo -ne "${C_PACKAGE_name}$package_name${default}: "
+    fi
+
+    echo -ne "${S_CLONING}"
+    git clone ${GITPARAMS} "$package_url" $TPM_PACKAGES/$package_name
+
+    # Set version
+    if [[ ! -z $package_version ]]; then
+        cd $TPM_PACKAGES/$package_name
+        local EVERSION=$(git tag -l $package_version | tail -n 1)
+        if [[ ! -z $EVERSION ]]; then
+            git checkout ${GITPARAMS} tags/${EVERSION}
+        fi
+    fi
+
+    local repojson="{}"
+    [[ -e "$TPM_PACKAGES/$package_name/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$package_name/.tpm.json)"
+
+    echo -ne "${S_BUILDING}"
+    auxBuild "$i" "$repojson"
+
+    echo -ne "${S_SOURCING}"
+    auxSource "$i" "$repojson"
+
+    echo -ne "${S_LINKING}"
+    auxLink "$i" "$repojson"
+
+    # TODO Write install info
+    echo -e "${S_SUCCESS}${default}"
 }
 
-installConfig() {
+configUpdate() {
+    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -not -name '.*' -type d | tail -n +2))
+    for i in ${PACKAGES[@]}; do
+        updateOne $i
+    done
+}
+
+configInstall() {
     [[ $PARAM_VERBOSE -eq 0 ]] && local GITPARAMS="--quiet"
     local PACKAGES=($(getPackages $TPM_CONFIG))
 
     for i in ${PACKAGES[@]}; do
-        package_url=$(githubify $(parseField 'name' $i))
-        package_repo=$(echo $package_url | rev | cut -f1,2 -d '/' | rev)
-        package_name=$(echo $package_repo | rev | cut -f1 -d '/' | rev)
-        package_source="$TPM_PACKAGES/${package_name}_source"
-        package_binary="$TPM_PACKAGES/${package_name}_binaries"
-        package_version="$(parseField 'version' $i)"
-
-        # Don't touch existing
-        if [[ -d "$TPM_PACKAGES/${package_name}" ]]; then
-            continue
-        fi
-
-        # TODO change these for the love of god
-        if [[ $PARAM_VERBOSE -eq 1 ]]; then
-            echo -ne "${C_SEPARATOR}== ${default}"
-            echo -ne "${C_PACKAGE_name}$package_name${default}"
-            echo -e "${C_SEPARATOR} =="
-        else
-            echo -ne "${C_PACKAGE_name}$package_name${default}: "
-        fi
-
-        echo -ne "${S_CLONING}"
-        git clone ${GITPARAMS} "$package_url" $TPM_PACKAGES/$package_name
-
-        # Set version
-        if [[ ! -z $package_version ]]; then
-            cd $TPM_PACKAGES/$package_name
-            local EVERSION=$(git tag -l $package_version | tail -n 1)
-            if [[ ! -z $EVERSION ]]; then
-                git checkout ${GITPARAMS} tags/${EVERSION}
-            fi
-        fi
-
-        local repojson="{}"
-        [[ -e "$TPM_PACKAGES/$package_name/.tpm.json" ]] && repojson="$(cat $TPM_PACKAGES/$package_name/.tpm.json)"
-
-        echo -ne "${S_BUILDING}"
-        auxBuild "$i" "$repojson"
-
-        echo -ne "${S_SOURCING}"
-        auxSource "$i" "$repojson"
-
-        echo -ne "${S_LINKING}"
-        auxLink "$i" "$repojson"
-
-        # TODO Write install info
-        echo -e "${S_SUCCESS}${default}"
+        parsePackage "$i"
+        [[ -d "$TPM_PACKAGES/${package_name}" ]] && continue
+        installOne "$i"
     done
 }
