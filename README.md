@@ -36,12 +36,15 @@ Example ``~/.tpm.json``:
     "preinstall": "echo \"running preinstall\"",
     "postinstall": "echo \"running postinstall\"",
     "packages": {
-        "https://github.com/baabelfish/tpm-filemanagement": {},
-        "nojhan/liquidprompt": {
+        "tpm": "baabelfish/tpm",
+        "tpm-filemanagement": "https://github.com/baabelfish/tpm-filemanagement",
+        "liquidprompt": {
+            "url": "nojhan/liquidprompt",
             "source": ["liquidprompt"]
         },
-        "git://code.i3wm.org/i3": {
-            "bin": { 
+        "i3": {
+            "url": "git://code.i3wm.org/i3",
+            "bin": {
                 "i3": "i3",
                 "i3bar": "i3bar",
                 "i3-config-wizard": "i3-config-wizard/i3-config-wizard",
@@ -55,7 +58,6 @@ Example ``~/.tpm.json``:
                 "i3-sensible-pager": "i3-sensible-pager",
                 "i3-sensible-terminal": "i3-sensible-terminal"
             },
-            "version": "4.5.1",
             "build": "make"
         }
     }
@@ -68,15 +70,14 @@ doing. It's purpose here is to provide a more complex example.
 # Commands
 
 #### Install
-Check configuration and install new packages.
+Install missing packages, or ones provided.
 ```bash
-$ tpm install https://github.com/x/y
-$ tpm install x/y
+$ tpm install packageName1 # Install or reinstall package
 $ tpm install # Install uninstalled packages
 ```
 
 #### Remove
-Check configuration and remove packages which are no longer wanted
+Remove packages
 ```bash
 $ tpm remove <name>
 ```
@@ -98,7 +99,7 @@ $ tpm update # Updates all installed packages
 #### History
 Shows git log of the package.
 ```bash
-$ tpm info <package>
+$ tpm history <package>
 ```
 
 #### Info
@@ -118,7 +119,7 @@ $ tpm list
 - persistent install `` tpm install --save <package> ``
 - Support .tar packages
 - List available versions and choose from them
-- Support branch names as versions
+  - Support tags/branch names as versions
 
 #### Enable
 Enables a disabled package.

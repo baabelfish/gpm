@@ -13,7 +13,7 @@ getPackages() {
     for (( i = 0; i < $LEN; i++ )); do
         PKG=$(echo $NAMES | $jq_bin -r .[${i}])
         DATA=$($jq_bin '.packages' ${1} | $jq_bin ".[\"$PKG\"]")
-        DATA=$(echo ${DATA} | $jq_bin "if (. | type) != \"string\" then . else {version: .} end")
+        DATA=$(echo ${DATA} | $jq_bin "if (. | type) != \"string\" then . else {url: .} end")
         DATA=$(echo ${DATA} | $jq_bin ". + {name: \"$PKG\"}")
         echo $DATA
     done
