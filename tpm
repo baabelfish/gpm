@@ -8,8 +8,8 @@ GOTERROR=0
 [[ $GOTERROR -eq 1 ]] && echo " is not set. Did you source the \$TPM_PACKAGES/.config-file?" && exit 1
 
 source $TPM_PACKAGES/tpm/helpers.sh
-source $TPM_PACKAGES/tpm/git.sh
 source $TPM_PACKAGES/tpm/json.sh
+source $TPM_PACKAGES/tpm/git.sh
 
 isTrue() {
     local reval=$(getField ${1} $TPM_CONFIG)

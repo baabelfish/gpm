@@ -68,7 +68,7 @@ doing. It's purpose here is to provide a more complex example.
 # Commands
 
 #### Install
-Check configuration and install new packages
+Check configuration and install new packages.
 ```bash
 $ tpm install https://github.com/x/y
 $ tpm install x/y
