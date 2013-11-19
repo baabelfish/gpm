@@ -50,8 +50,12 @@ mkdir -p $TPM_SYMLINKS
 mkdir -p $TPM_PACKAGES
 mkdir -p $TPM_PACKAGES/.aux
 
-# Fetch tpm
-[[ ! -e $TPM_PACKAGES/tpm ]] && echo "" && echo -e "Fetching ${bold}tpm${default}" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
+# Fetch tpm (if found pull the repo)
+if [[ ! -e $TPM_PACKAGES/tpm ]]; then
+    echo -e "\nFetching ${bold}tpm${default}" && git clone https://github.com/baabelfish/tpm.git $TPM_PACKAGES/tpm
+else
+    echo -e "\nUpdating ${bold}tpm${default}" && cd $TPM_PACKAGES/tpm && git pull
+fi
 
 # Configure
 echo "export TPM_SYMLINKS=$TPM_SYMLINKS" > $TPM_PACKAGES/.config
