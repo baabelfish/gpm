@@ -99,7 +99,7 @@ commandList() {
 
 commandRemove() {
     if [[ ${#PACKAGES[@]} -eq 0 ]]; then
-        echo "To be implemented"
+        configRemove
     else
         for i in ${PACKAGES[@]}; do
             removeOne $i

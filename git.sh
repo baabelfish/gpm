@@ -269,6 +269,16 @@ installOne() {
     echo -e "${S_SUCCESS}${default}"
 }
 
+configRemove() {
+    for i in ${package_installed[@]}; do
+        local name=$(echo $i | rev | cut -f1 -d'/' | rev)
+        parsePackageByName $name
+        if [[ no_such_package -ne 0 ]]; then
+            removeOne $name
+        fi
+    done
+}
+
 configUpdate() {
     for i in ${package_installed[@]}; do
         local name=$(echo $i | rev | cut -f1 -d'/' | rev)
