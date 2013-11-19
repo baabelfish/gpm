@@ -70,15 +70,14 @@ doing. It's purpose here is to provide a more complex example.
 # Commands
 
 #### Install
-Check configuration and install new packages.
+Install missing packages, or ones provided.
 ```bash
-$ tpm install https://github.com/x/y
-$ tpm install x/y
+$ tpm install packageName1 # Install or reinstall package
 $ tpm install # Install uninstalled packages
 ```
 
 #### Remove
-Check configuration and remove packages which are no longer wanted
+Remove packages
 ```bash
 $ tpm remove <name>
 ```
@@ -100,7 +99,7 @@ $ tpm update # Updates all installed packages
 #### History
 Shows git log of the package.
 ```bash
-$ tpm info <package>
+$ tpm history <package>
 ```
 
 #### Info
@@ -121,7 +120,7 @@ $ tpm list
 - persistent install `` tpm install --save <package> ``
 - Support .tar packages
 - List available versions and choose from them
-- Support branch names as versions
+  - Support tags/branch names as versions
 
 #### Enable
 Enables a disabled package.
