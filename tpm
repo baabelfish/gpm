@@ -1,21 +1,21 @@
 #!/bin/bash
 IFS=$'\n'
 
-source $TPM_PACKAGES/tpm/helpers.sh
-source $TPM_PACKAGES/tpm/json.sh
-source $TPM_PACKAGES/tpm/git.sh
-
 JQ_NOT_DOWNLOADED=0
 JQ_NO_NATIVE=0
 GOTERROR=0
 [[ -z $TPM_PACKAGES ]] && echo -n "\$TPM_PACKAGES" && GOTERROR=1
 [[ -z $TPM_SYMLINKS ]] && echo -n "\$TPM_SYMLINKS" && GOTERROR=1
 [[ -z $TPM_CONFIG ]] && echo -n "\$TPM_CONFIG" && GOTERROR=1
-which jq > /dev/null
+which jq > /dev/null 2> /dev/null
 [[ "$?" != "0" ]] && JQ_NO_NATIVE=1
 [[ ! -e "$TPM_PACKAGES/.aux/jq" ]] && JQ_NOT_DOWNLOADED=1
 [[ $JQ_NO_NATIVE -ne 0 ]] && [[ $JQ_NOT_DOWNLOADED -ne 0 ]] && echo -e "${bold}jq${default} not found" && exit 1
 [[ $GOTERROR -eq 1 ]] && echo " is not set. Did you source the \$TPM_PACKAGES/.config-file?" && exit 1
+
+source $TPM_PACKAGES/tpm/helpers.sh
+source $TPM_PACKAGES/tpm/json.sh
+source $TPM_PACKAGES/tpm/git.sh
 
 isTrue() {
     local reval=$(getField ${1} $TPM_CONFIG)
