@@ -72,7 +72,10 @@ doing. It's purpose here is to provide a more complex example.
 #### Install
 Install missing packages, or ones provided.
 ```bash
-$ tpm install packageName1 # Install or reinstall package
+$ tpm install packageName1 # Install by name configured at .tpm.json
+$ tpm install user/repo # Install package (name = repo)
+$ tpm install git://code.i3wm.org/i3 # name = i3
+$ tpm install https://github.com/baabelfish/tpm-filemanagement # name = tpm-filemanagement
 $ tpm install # Install uninstalled packages
 ```
 
