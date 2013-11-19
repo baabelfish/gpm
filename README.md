@@ -39,7 +39,7 @@ Example ``~/.tpm.json``:
         "tpm": "baabelfish/tpm",
         "tpm-filemanagement": "https://github.com/baabelfish/tpm-filemanagement",
         "liquidprompt": {
-            "url: "nojhan/liquidprompt",
+            "url": "nojhan/liquidprompt",
             "source": ["liquidprompt"]
         },
         "i3": {
