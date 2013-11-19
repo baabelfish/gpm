@@ -78,9 +78,13 @@ $ tpm install # Install uninstalled packages
 #### Remove
 Check configuration and remove packages which are no longer wanted
 ```bash
-$ tpm remove https://github.com/x/y
-$ tpm remove x/y
-$ tpm remove # Remove packages which are no longer listed on config
+$ tpm remove <name>
+```
+
+#### Prune
+Removes all packages not in configuration file.
+```bash
+$ tpm prune
 ```
 
 #### Update

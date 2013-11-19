@@ -97,9 +97,13 @@ commandList() {
     done
 }
 
+commandPrune() {
+    configRemove
+}
+
 commandRemove() {
     if [[ ${#PACKAGES[@]} -eq 0 ]]; then
-        configRemove
+        echo "You should list packages"
     else
         for i in ${PACKAGES[@]}; do
             removeOne $i
@@ -125,6 +129,7 @@ for C in ${*}; do
         'install') setCommand 'install' ;;
         'list')    setCommand 'list' ;;
         'remove')  setCommand 'remove' ;;
+        'prune')   setCommand 'prune' ;;
         'search')  setCommand 'search' ;;
         'update')  setCommand 'update' ;;
         '-h') ;& '--help')
@@ -146,11 +151,12 @@ configureApplication
 case $COMMAND in
     'disable') commandDisable ;;
     'enable')  commandEnable ;;
-    'history')  commandHistory ;;
+    'history') commandHistory ;;
     'info')    commandInfo ;;
     'install') commandInstall ;;
     'list')    commandList ;;
     'remove')  commandRemove ;;
+    'prune')   commandPrune ;;
     'search')  commandSearch ;;
     'update')  commandUpdate ;;
     *)
