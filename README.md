@@ -114,7 +114,6 @@ $ tpm list
 ```
 
 # TODO
-- More clever update
 - Complete removal of tpm (maybe with ``tpm remove tpm``
 - persistent install `` tpm install --save <package> ``
 - Support .tar packages
