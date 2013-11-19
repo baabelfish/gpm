@@ -150,6 +150,7 @@ listOne() {
 }
 
 removeOne() {
+    [[ $name == "tpm" ]] && echo "I bet you don't want to do that" && return
     if [[ -d "$TPM_PACKAGES/$1" ]]; then
         local location_bin="$TPM_PACKAGES/${1}_binaries"
         local location_source="$TPM_PACKAGES/${1}_source"
@@ -171,8 +172,6 @@ removeOne() {
 updateOne() {
     cd "$1"
     [[ $(pwd) == "$HOME" ]] && exit 7
-    local name=$(echo $1 | rev | cut -f1 -d '/' | rev)
-    [[ $name == "tpm" ]] && return
     printName $name
 
     # Determine if update is needed
