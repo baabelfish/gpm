@@ -36,12 +36,15 @@ Example ``~/.tpm.json``:
     "preinstall": "echo \"running preinstall\"",
     "postinstall": "echo \"running postinstall\"",
     "packages": {
-        "https://github.com/baabelfish/tpm-filemanagement": {},
-        "nojhan/liquidprompt": {
+        "tpm": "baabelfish/tpm",
+        "tpm-filemanagement": "https://github.com/baabelfish/tpm-filemanagement",
+        "liquidprompt": {
+            "url: "nojhan/liquidprompt",
             "source": ["liquidprompt"]
         },
-        "git://code.i3wm.org/i3": {
-            "bin": { 
+        "i3": {
+            "url": "git://code.i3wm.org/i3",
+            "bin": {
                 "i3": "i3",
                 "i3bar": "i3bar",
                 "i3-config-wizard": "i3-config-wizard/i3-config-wizard",
@@ -55,7 +58,6 @@ Example ``~/.tpm.json``:
                 "i3-sensible-pager": "i3-sensible-pager",
                 "i3-sensible-terminal": "i3-sensible-terminal"
             },
-            "version": "4.5.1",
             "build": "make"
         }
     }
