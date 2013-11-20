@@ -53,12 +53,10 @@ configureApplication() {
 }
 
 parsePackage() {
-    package_url=$(githubify $(parseField 'name' "$1"))
-    package_repo=$(echo $package_url | rev | cut -f1,2 -d '/' | rev)
-    package_name=$(echo $package_repo | rev | cut -f1 -d '/' | rev)
+    package_name=$(parseField 'name' "$1")
+    package_url=$(githubify $(parseField 'url' "$1"))
     package_source="$TPM_PACKAGES/${package_name}_source"
     package_binary="$TPM_PACKAGES/${package_name}_binaries"
-    package_version="$(parseField 'version' "$1")"
     package="$1"
 }
 
