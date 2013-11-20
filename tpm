@@ -32,6 +32,7 @@ PARAM_NOCOLOR=$(isTrue 'nocolor')
 PARAM_NOCONFIRM=$(isTrue 'noconfirm')
 PARAM_QUIET=$(isTrue 'quiet')
 PARAM_VERBOSE=$(isTrue 'verbose')
+PARAM_FORCE=0
 
 printHelp() {
     echo "\
@@ -125,7 +126,6 @@ commandUpdate() {
     configUpdate
 }
 
-
 for C in ${*}; do
     case $C in
         'disable') setCommand 'disable' ;;
@@ -146,6 +146,7 @@ for C in ${*}; do
         '-C') ;& '--noconfirm') PARAM_NOCONFIRM=1 ;;
         '-q') ;& '--quiet')     PARAM_QUIET=1 ;;
         '-v') ;& '--verbose')   PARAM_VERBOSE=1 ;;
+        '-f') ;& '--force')     PARAM_FORCE=1 ;;
         *)
             PACKAGES=("${PACKAGES[@]}" "$C")
             ;;

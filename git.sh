@@ -148,7 +148,25 @@ listOne() {
 }
 
 removeOne() {
-    [[ $name == "tpm" ]] && echo "I bet you don't want to do that" && return
+    parsePackageByName $1
+    [[ no_such_package -ne 0 ]] && return
+    if [[ "$package_name" == "tpm" ]]; then
+        if [[ "$PARAM_FORCE" == "1" ]]; then
+            echo -ne "This will delete everything except ${TPM_CONFIG}. Are you sure? [y/N]: "
+            read confirmation
+            if [[ "$confirmation" == "y" ]] || [[ "$confirmation" == "Y" ]]; then
+                [[ ! -z $TPM_SYMLINKS ]] && rm -rf "$TPM_SYMLINKS"
+                [[ ! -z $TPM_PACKAGES ]] && rm -rf "$TPM_PACKAGES"
+                echo "TPM was succesfully removed! :)"
+                exit 0
+            else
+                exit 1
+            fi
+        else
+            echo -e "I bet you ${bold}don't${default} want to do that" && return
+            exit 1
+        fi
+    fi
     if [[ -d "$TPM_PACKAGES/$1" ]]; then
         local location_bin="$TPM_PACKAGES/${1}_binaries"
         local location_source="$TPM_PACKAGES/${1}_source"
@@ -269,10 +287,7 @@ installOne() {
 configRemove() {
     for i in ${package_installed[@]}; do
         local name=$(echo $i | rev | cut -f1 -d'/' | rev)
-        parsePackageByName $name
-        if [[ no_such_package -ne 0 ]]; then
-            removeOne $name
-        fi
+        removeOne $name
     done
 }
 
