@@ -55,8 +55,9 @@ configureApplication() {
 parsePackage() {
     package_name=$(parseField 'name' "$1")
     package_url=$(githubify $(parseField 'url' "$1"))
-    package_source="$TPM_PACKAGES/${package_name}_source"
-    package_binary="$TPM_PACKAGES/${package_name}_binaries"
+    package_path="$TPM_PACKAGES/$package_name"
+    package_source="${package_path}_source"
+    package_binary="${package_path}_binaries"
     package="$1"
 }
 
@@ -160,9 +161,7 @@ cleanBinaries() {
 }
 
 removeOne() {
-    parsePackageByName $1
-    [[ no_such_package -ne 0 ]] && return
-    if [[ "$package_name" == "tpm" ]]; then
+    if [[ "$1" == "tpm" ]]; then
         if [[ "$PARAM_FORCE" == "1" ]]; then
             echo -ne "This will delete everything except ${TPM_CONFIG}. Are you sure? [y/N]: "
             read confirmation
@@ -202,9 +201,14 @@ removeOne() {
 }
 
 updateOne() {
-    cd "$1"
+    parsePackageByName $1
+    if [[ $no_such_package -eq 1 ]]; then
+        return
+    fi
+
+    cd "$package_path"
     [[ $(pwd) == "$HOME" ]] && exit 7
-    printName $name
+    printName $package_name
 
     # Determine if update is needed
     # TODO check if user configuration has changed
@@ -300,20 +304,20 @@ installOne() {
     echo -e "${S_SUCCESS}${default}"
 }
 
-configRemove() {
+configPrune() {
     for i in ${package_installed[@]}; do
-        local name=$(echo $i | rev | cut -f1 -d'/' | rev)
-        removeOne $name
+        local name=$(echo $i | rev | cut -f1 -d '/' | rev)
+        parsePackageByName $name
+        if [[ $no_such_package -eq 1 ]]; then
+            removeOne $name
+        fi
     done
 }
 
 configUpdate() {
     for i in ${package_installed[@]}; do
-        local name=$(echo $i | rev | cut -f1 -d'/' | rev)
-        parsePackageByName $name
-        if [[ no_such_package -eq 0 ]]; then
-            updateOne $i
-        fi
+        local name=$(echo $i | rev | cut -f1 -d '/' | rev)
+        updateOne $name
     done
 }
 

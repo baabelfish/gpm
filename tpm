@@ -107,7 +107,13 @@ commandList() {
 }
 
 commandPrune() {
-    configRemove
+    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
+        configPrune
+    else
+        for i in ${PACKAGES[@]}; do
+            removeOne $i
+        done
+    fi
 }
 
 commandRemove() {
@@ -125,7 +131,13 @@ commandSearch() {
 }
 
 commandUpdate() {
-    configUpdate
+    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
+        configUpdate
+    else
+        for i in ${PACKAGES[@]}; do
+            updateOne $i
+        done
+    fi
 }
 
 # Parses program parameters
