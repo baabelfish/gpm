@@ -7,7 +7,7 @@ YELLOW="[38;05;222m"
 default='\033[0m'
 bold='\033[1m'
 
-TPM_SYMLINKS="$HOME/bin"
+TPM_SYMLINKS="$HOME/.local/bin"
 TPM_PACKAGES="$HOME/.local/tpm"
 TPM_CONFIG="$HOME/.tpm.json"
 

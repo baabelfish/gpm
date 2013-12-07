@@ -147,6 +147,18 @@ listOne() {
     echo -e "${C_PACKAGE_NAME}$(getBasename $1)${default} (${C_PACKAGE_UPDATED}updated${default}: $(git log -1|grep '^Date'|cut -f2- -d':'|sed 's/^ *//g'))"
 }
 
+# Takes a package name as a parameter
+cleanBinaries() {
+    local location_bin="$TPM_PACKAGES/${1}_binaries"
+    if [[ -e $location_bin ]]; then
+        local BINARIES=($(cat $location_bin))
+        for i in ${BINARIES[@]}; do
+            rm -f "${i}"
+        done
+        rm -f $location_bin
+    fi
+}
+
 removeOne() {
     parsePackageByName $1
     [[ no_such_package -ne 0 ]] && return
@@ -155,8 +167,12 @@ removeOne() {
             echo -ne "This will delete everything except ${TPM_CONFIG}. Are you sure? [y/N]: "
             read confirmation
             if [[ "$confirmation" == "y" ]] || [[ "$confirmation" == "Y" ]]; then
-                [[ ! -z $TPM_SYMLINKS ]] && rm -rf "$TPM_SYMLINKS"
-                [[ ! -z $TPM_PACKAGES ]] && rm -rf "$TPM_PACKAGES"
+                # [[ ! -z $TPM_PACKAGES ]] && rm -rf "$TPM_PACKAGES"
+                echo "$package_installed"
+                for i in ${package_installed[@]}; do
+                    echo "removing $i"
+                    cleanBinaries $i
+                done
                 echo "TPM was succesfully removed! :)"
                 exit 0
             else
