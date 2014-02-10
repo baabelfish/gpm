@@ -132,13 +132,10 @@ commit() {
             installPackage $name
         fi
 
-        # If still not installed
-        if [[ ! -d $TPM_DIR/$name ]]; then
-            echo "$name is not installed?"
-        fi
-
         for source in ${SOURCES["$name"]}; do
-            source $TPM_DIR/$name/$source
+            if [[ -f $TPM_DIR/$name/$source ]]; then
+                source $TPM_DIR/$name/$source
+            fi
         done
     done
 
@@ -150,10 +147,9 @@ commit() {
         local pkg=${info[0]}
         local source=${info[1]}
 
-        if [[ -f $TPM_DIR/$pkg/$source ]]; then
-            if [[ ! -f $TPM_BIN/$target ]]; then
-                ln -s $TPM_DIR/$pkg/$source $TPM_BIN/$target
-            fi
+        # Source exists and target doesn't
+        if [[ -f $TPM_DIR/$pkg/$source ]] && [[ ! -f $TPM_BIN/$target ]]; then
+            ln -s $TPM_DIR/$pkg/$source $TPM_BIN/$target
         fi
     done
 }
