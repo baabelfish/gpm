@@ -1,189 +1,144 @@
 #!/bin/bash
-IFS=$'\n'
 
-# Check for misconfigurations before blowing everything up
-GOTERROR=0
-JQ_NOT_DOWNLOADED=0
-JQ_NO_NATIVE=0
-[[ -z $TPM_PACKAGES ]] && echo -n "\$TPM_PACKAGES" && GOTERROR=1
-[[ -z $TPM_SYMLINKS ]] && echo -n "\$TPM_SYMLINKS" && GOTERROR=1
-[[ -z $TPM_CONFIG ]] && echo -n "\$TPM_CONFIG" && GOTERROR=1
-which jq > /dev/null 2> /dev/null
-[[ "$?" != "0" ]] && JQ_NO_NATIVE=1
-[[ ! -e "$TPM_PACKAGES/.aux/jq" ]] && JQ_NOT_DOWNLOADED=1
-[[ $JQ_NO_NATIVE -ne 0 ]] && [[ $JQ_NOT_DOWNLOADED -ne 0 ]] && echo -e "${bold}jq${default} not found" && exit 1
-[[ $GOTERROR -eq 1 ]] && echo " is not set. Did you source the \$TPM_PACKAGES/.config-file?" && exit 1
+declare -a PACKAGES
+declare -A URLS
+declare -A SOURCES
+declare -A LINKS
+declare -A BUILD
+declare -A VERSION
 
-source $TPM_PACKAGES/tpm/helpers.sh
-source $TPM_PACKAGES/tpm/json.sh
-source $TPM_PACKAGES/tpm/git.sh
+# TPM_DIR = Path where tpm packages are installed to
 
-# Checks user preferences from configuration
-isTrue() {
-    local reval=$(getField ${1} $TPM_CONFIG)
-    if [[ $reval == "1" ]] || [[ $reval == "true" ]]; then
-        echo 1
+# TPM_BIN = Path where links are created, user should add this to PATH himself
+# Directory should also be completely devoted for TPM as "tpm clean" will delete unnecessary files
+
+function confirm {
+        read -r -p "$1 [Y/n] " yes
+        yes=${yes,,} # tolower
+        [[ $yes =~ ^(yes|y| ) ]]
+}
+
+## $1 - url or github suffix
+# Convert url to github form
+githubify() {
+    local regex='^http|^git:'
+    if [[ $1 =~ $regex ]]; then
+        echo "$1"
     else
-        echo 0
+        echo "https://github.com/${1}"
     fi
 }
 
-COMMAND=''
-PACKAGES=()
-PARAM_NOCOLOR=$(isTrue 'nocolor')
-PARAM_NOCONFIRM=$(isTrue 'noconfirm')
-PARAM_QUIET=$(isTrue 'quiet')
-PARAM_VERBOSE=$(isTrue 'verbose')
-PARAM_FORCE=0
-
-printHelp() {
-    echo "\
-Usage: tpm [option] <command>
-
-command := disable [packages] |
-           enable  [packages] |
-           history [packages] |
-           info    [packages] |
-           install [packages] |
-           search  [packages] |
-           update  [packages] |
-
-option := --help | --nocolor | --noconfirm | --quiet | --verbose
-"
-exit 1
+# $1 = Pkg name
+# $2 = file to source
+addSource() {
+    SOURCES["$1"]="$2 ${SOURCES["$1"]}"
 }
 
-[[ -z $1 ]] && printHelp
+# $1 = Pkg name
+# $2 = Target name
+# $3 = Source filename
+addBin() {
+    # Target name has to be unique (but package might have multiple links)
+    # index by target name
+    LINKS["$2"]="$1 $3"
+}
 
-setCommand() {
-    if [[ ! -z $COMMAND ]]; then
-        PACKAGES=("${PACKAGES[@]}" "$C")
-    else
-        COMMAND=$1
+# $1 = Pkg name
+# $2 = Command
+build() {
+    BUILD["$1"]="$2"
+}
+
+# $1 = Pkg name
+# $2 = Version
+version() {
+    VERSION["$1"]="$2"
+}
+
+# $1 = Pkg name
+# $2 = Url
+plug() {
+    PACKAGES+=($1)
+    URLS["$1"]="$2"
+}
+
+installPackage() {
+    local url=${URLS["$1"]}
+    git clone $(githubify $url) $TPM_DIR/$1
+
+    buildPackage $1
+}
+
+updatePackage() {
+    cd $TPM_DIR/$1
+    git pull
+    buildPackage $1
+}
+
+buildPackage() {
+    local build_command=${BUILD["$1"]}
+    if [[ -z $build_command ]]; then
+        cd $TPM_DIR/$1
+        $build_command
     fi
 }
 
-commandDisable() {
-    echo "UNDER CONSTRUCTION: commandDisable"
-}
+commit() {
+    for name in ${PACKAGES[@]}; do
+        echo "? $name"
+        if [[ ! -d $TPM_DIR/$name ]] && confirm "$name is not installed. Install?"; then
+            installPackage
+        fi
 
-commandEnable() {
-    echo "UNDER CONSTRUCTION: commandEnable"
-}
+        # If still not installed
+        if [[ ! -d $TPM_DIR/$name ]]; then
+            echo "$name is not installed?"
+        fi
 
-commandHistory() {
-    if [[ ${#PACKAGES[@]} -ne 1 ]]; then
-        echo "You must provide one package name."
-    else
-        historyOne ${PACKAGES[0]}
-    fi
-}
+        if [[ -d $TPM_DIR/$name ]]; then
+            if [[ -f $TPM_DIR/$name/.tpm.sh ]]; then
+                . $TPM_DIR/$name/.tpm.sh
+            fi
+        fi
 
-commandInfo() {
-    if [[ ${#PACKAGES[@]} -ne 1 ]]; then
-        echo "You must provide one package name."
-    else
-        infoOne ${PACKAGES[0]}
-    fi
-}
+        for source in ${SOURCES["$name"]}; do
+            echo "source $source"
+            source $TPM_DIR/$name/$source
+        done
+    done
 
-commandInstall() {
-    local PREINSTALL="$(getField 'preinstall' $TPM_CONFIG)"
-    local POSTINSTALL="$(getField 'postinstall' $TPM_CONFIG)"
-    [[ ! -z $PREINSTALL ]] && eval $PREINSTALL
-    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
-        configInstall
-    fi
-    if [[ ! -z $POSTINSTALL ]]; then
-        eval $POSTINSTALL
-    fi
-}
+    # Make sure links are created
+    for target in ${!LINKS[@]}; do
+        local info=(${LINKS["$target"]})
+        local pkg=${info[0]}
+        local source=${info[1]}
 
-commandList() {
-    PACKAGES=($(find "$TPM_PACKAGES" -maxdepth 1 -not -name '.*' -type d | tail -n +2 | sort))
-    for i in ${PACKAGES[@]}; do
-        listOne $i
+        if [[ -f $TPM_DIR/$pkg/$source ]]; then
+            if [[ ! -f $TPM_BIN/$target ]]; then
+                echo ln -s $TPM_DIR/$pkg/$source $TPM_BIN/$target
+                ln -s $TPM_DIR/$pkg/$source $TPM_BIN/$target
+            fi
+        fi
     done
 }
 
-commandPrune() {
-    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
-        configPrune
-    else
-        for i in ${PACKAGES[@]}; do
-            removeOne $i
-        done
-    fi
+# CLI, removed old packages and symlinks
+clean() {
+    echo "foo"
 }
 
-commandRemove() {
-    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
-        echo "You should list packages"
-    else
-        for i in ${PACKAGES[@]}; do
-            removeOne $i
-        done
-    fi
+# CLI, update packages
+update() {
+    for pkg in $TPM_DIR/*; do
+        updatePackage $pkg
+    done
 }
 
-commandSearch() {
-    echo "UNDER CONSTRUCTION: commandSearch"
-}
-
-commandUpdate() {
-    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
-        configUpdate
-    else
-        for i in ${PACKAGES[@]}; do
-            updateOne $i
-        done
-    fi
-}
-
-# Parses program parameters
-for C in ${*}; do
-    case $C in
-        'disable') setCommand 'disable' ;;
-        'enable')  setCommand 'enable' ;;
-        'history') setCommand 'history' ;;
-        'info')    setCommand 'info' ;;
-        'install') setCommand 'install' ;;
-        'list')    setCommand 'list' ;;
-        'remove')  setCommand 'remove' ;;
-        'prune')   setCommand 'prune' ;;
-        'search')  setCommand 'search' ;;
-        'update')  setCommand 'update' ;;
-        '-h') ;& '--help')
-            printHelp
-            exit 1
-            ;;
-        '-c') ;& '--nocolor')   PARAM_NOCOLOR=1 ;;
-        '-C') ;& '--noconfirm') PARAM_NOCONFIRM=1 ;;
-        '-q') ;& '--quiet')     PARAM_QUIET=1 ;;
-        '-v') ;& '--verbose')   PARAM_VERBOSE=1 ;;
-        '-f') ;& '--force')     PARAM_FORCE=1 ;;
-        *)
-            PACKAGES=("${PACKAGES[@]}" "$C")
-            ;;
-    esac
-done
-
-configureApplication
-
-# Runs the chosen one
-case $COMMAND in
-    'disable') commandDisable ;;
-    'enable')  commandEnable ;;
-    'history') commandHistory ;;
-    'info')    commandInfo ;;
-    'install') commandInstall ;;
-    'list')    commandList ;;
-    'remove')  commandRemove ;;
-    'prune')   commandPrune ;;
-    'search')  commandSearch ;;
-    'update')  commandUpdate ;;
-    *)
-        echo "Invalid command"
-        exit 1
-        ;;
+# CLI, run command
+case $1 in
+    'clean')   clean ;;
+    'install') install ;;
+    'update')  update ;;
+    *) ;;
 esac

@@ -1,5 +1,0 @@
-# !/bin/bash
-SOURCEFILES=($(find $TPM_PACKAGES -maxdepth 1 | grep '_source$'))
-for i in ${SOURCEFILES[@]}; do
-    source $i
-done
