@@ -14,7 +14,6 @@ This piece of "software" was designed (usability wise) after [npm](https://npmjs
 - No need for sudo
 - Tab completion for bash/zsh
 - Only dependences are bash/zsh and git
-  - ...and [jq](http://stedolan.github.io/jq/), for now...
 
 # Installation
 Run installation script:
@@ -29,108 +28,46 @@ NOTE: Remember to add the line it provides to your ``~/.zshrc`` or ``~/.bashrc``
 - Run ``tpm install``
 - Restart shell (to get sourced packages working)
 
-Example ``~/.tpm.json``:
-```json
-{
-    "verbose": true,
-    "preinstall": "echo \"running preinstall\"",
-    "postinstall": "echo \"running postinstall\"",
-    "packages": {
-        "tpm": "baabelfish/tpm",
-        "tpm-filemanagement": "https://github.com/baabelfish/tpm-filemanagement",
-        "liquidprompt": {
-            "url": "nojhan/liquidprompt",
-            "source": ["liquidprompt"]
-        },
-        "i3": {
-            "url": "git://code.i3wm.org/i3",
-            "bin": {
-                "i3": "i3",
-                "i3bar": "i3bar",
-                "i3-config-wizard": "i3-config-wizard/i3-config-wizard",
-                "i3-dmenu-desktop": "i3-dmenu-desktop",
-                "i3-dump-log": "i3-dump-log/i3-dump-log",
-                "i3-input": "i3-input/i3-input",
-                "i3-migrate-config-to-v4": "i3-migrate-config-to-v4",
-                "i3-msg": "i3-msg/i3-msg",
-                "i3-nagbar": "i3-nagbar/i3-nagbar",
-                "i3-sensible-editor": "i3-sensible-editor",
-                "i3-sensible-pager": "i3-sensible-pager",
-                "i3-sensible-terminal": "i3-sensible-terminal"
-            },
-            "build": "make"
-        }
-    }
-}
-```
+Example ``~/.tpm.sh``:
+```bash
+#!/bin/bash
 
-You shouldn't install software like i3 with tpm unless you know what you're
-doing. It's purpose here is to provide a more complex example.
+export TPM_BIN=$HOME/.local/tpm-bin
+export TPM_DIR=$HOME/.local/tpm
+. ${TPM_DIR}/tpm/tpm
+
+plug tpm "baabelfish/tpm"
+
+plug liquidprompt "nojhan-liquidprompt"
+addSource liquidprompt "liquidprompt"
+
+if [[ $HOSTNAME == "juho-desktop" ]] || [[ $HOSTNAME == "juho-laptop" ]]; then
+    plug dspmgr "Deraen/dspmgr"
+
+    plug ponymix "falconindy/ponymix"
+    build ponymix "make"
+    addBin ponymix ponymix ponymix
+fi
+
+commit
+```
 
 # Commands
 
 #### Install
-Install missing packages, or ones provided.
+Check configuration and install new packages
 ```bash
-$ tpm install packageName1 # Install by name configured at .tpm.json
-$ tpm install user/repo # Install package (name = repo)
-$ tpm install git://code.i3wm.org/i3 # name = i3
-$ tpm install https://github.com/baabelfish/tpm-filemanagement # name = tpm-filemanagement
-$ tpm install # Install uninstalled packages
+$ tpm install
 ```
 
-#### Remove
-Remove packages
+#### Clean
+Remove unnecessary packages
 ```bash
-$ tpm remove <name>
-```
-
-#### Prune
-Removes all packages not in configuration file.
-```bash
-$ tpm prune
+$ tpm clean
 ```
 
 #### Update
-Updates installed packages, or ones provided.
+Updates installed packages
 ```bash
-$ tpm update tpm
-$ tpm update x/y
-$ tpm update # Updates all installed packages
-```
-
-#### History
-Shows git log of the package.
-```bash
-$ tpm history <package>
-```
-
-#### Info
-Shows package information. Version, etc.
-```bash
-$ tpm info <package>
-```
-
-#### List
-Lists installed packages, versions and date last updated.
-```bash
-$ tpm list
-```
-
-# TODO
-- persistent install `` tpm install --save <package> ``
-- Support .tar packages
-- List available versions and choose from them
-  - Support tags/branch names as versions
-
-#### Enable
-Enables a disabled package.
-```bash
-$ tpm enable <packages>
-```
-
-#### Disable
-Disables an installed package.
-```bash
-$ tpm disable <packages>
+$ tpm update
 ```
