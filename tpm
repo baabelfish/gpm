@@ -32,26 +32,50 @@ githubify() {
 # $1 = Pkg name
 # $2 = file to source
 addSource() {
-    SOURCES["$1"]="$2 ${SOURCES["$1"]}"
+    if [[ $HACK_PKG ]]; then
+        local name=$HACK_PKG
+        local source=$1
+    else
+        local name=$1
+        local source=$2
+    fi
+    SOURCES["$name"]="$source ${SOURCES["$name"]}"
 }
 
 # $1 = Pkg name
 # $2 = Target name
 # $3 = Source filename
 addBin() {
+    if [[ $HACK_PKG ]]; then
+        local name=$HACK_PKG
+        local target=$1
+        local source=$2
+    else
+        local name=$1
+        local target=$2
+        local source=$3
+    fi
     # Target name has to be unique (but package might have multiple links)
     # index by target name
-    LINKS["$2"]="$1 $3"
+    LINKS["$target"]="$name $source"
 }
 
 # $1 = Pkg name
 # $2 = Command
 build() {
-    BUILD["$1"]="$2"
+    if [[ $HACK_PKG ]]; then
+        local name=$HACK_PKG
+        local command=$1
+    else
+        local name=$1
+        local command=$2
+    fi
+    BUILD["$name"]="$command"
 }
 
 # $1 = Pkg name
 # $2 = Version
+# I don't think it would be useful to be able to set this from packages .tpm.sh (thus, no HACK_PKG hack)
 version() {
     VERSION["$1"]="$2"
 }
@@ -78,17 +102,20 @@ updatePackage() {
 
 buildPackage() {
     local build_command=${BUILD["$1"]}
-    if [[ -z $build_command ]]; then
+    if [[ $build_command ]]; then
         cd $TPM_DIR/$1
         $build_command
     fi
 }
 
 commit() {
+    if [[ $CLI ]]; then
+        return
+    fi
+
     for name in ${PACKAGES[@]}; do
-        echo "? $name"
         if [[ ! -d $TPM_DIR/$name ]] && confirm "$name is not installed. Install?"; then
-            installPackage
+            installPackage $name
         fi
 
         # If still not installed
@@ -98,12 +125,13 @@ commit() {
 
         if [[ -d $TPM_DIR/$name ]]; then
             if [[ -f $TPM_DIR/$name/.tpm.sh ]]; then
+                HACK_PKG=$name
                 . $TPM_DIR/$name/.tpm.sh
+                unset HACK_PKG
             fi
         fi
 
         for source in ${SOURCES["$name"]}; do
-            echo "source $source"
             source $TPM_DIR/$name/$source
         done
     done
@@ -125,14 +153,71 @@ commit() {
 
 # CLI, removed old packages and symlinks
 clean() {
-    echo "foo"
+    CLI=true
+
+    . $HOME/.tpm.sh
+
+    for x in $TPM_DIR/*/.tpm.sh; do
+        HACK_PKG=$name
+        . $x
+        unset HACK_PKG
+    done
+
+    local extras=""
+    for x in $TPM_DIR/*; do
+        local name=$(basename $x)
+        if [[ -z ${URLS["$name"]} ]]; then
+            echo "Found extra package: $name"
+            extras="$extras $x"
+        fi
+    done
+
+    if [[ $extras ]] && confirm "Remove extra packages"; then
+        rm -rf $extras
+    fi
+
+    extras=""
+    for x in $TPM_BIN/*; do
+        local link=$(readlink $x)
+        if [[ -z $link ]]; then
+            echo "Found A FILE: $x at bin directory. Directory should only contain symlinks."
+            continue
+        fi
+
+        local name=$(basename $x)
+        if [[ -z ${LINKS["$name"]} ]]; then
+            echo "Found extra link $name"
+            extras="$extras $x"
+        fi
+    done
+
+    if [[ $extras ]] && confirm "Remove extra links"; then
+        rm -r $extras
+    fi
 }
 
 # CLI, update packages
 update() {
-    for pkg in $TPM_DIR/*; do
+    CLI=true
+    . $HOME/.tpm.sh
+
+    for dir in $TPM_DIR/*; do
+        local pkg=$(basename $dir)
+        echo "Updating $pkg"
         updatePackage $pkg
     done
+
+    unset CLI
+    commit
+}
+
+# CLI, install missing
+install() {
+    CLI=true
+    . $HOME/.tpm.sh
+
+    unset CLI
+    commit
 }
 
 # CLI, run command
