@@ -91,6 +91,12 @@ installPackage() {
     local url=${URLS["$1"]}
     git clone $(githubify $url) $TPM_DIR/$1
 
+    local version=${VERSION["$1"]}
+    if [[ $version ]]; then
+        cd $TPM_DIR/$1
+        git checkout $version
+    fi
+
     buildPackage $1
 }
 
@@ -108,6 +114,14 @@ buildPackage() {
     fi
 }
 
+loadPackageFoo() {
+    for x in $TPM_DIR/*/.tpm.sh; do
+        HACK_PKG=$name
+        . $x
+        unset HACK_PKG
+    done
+}
+
 commit() {
     if [[ $CLI ]]; then
         return
@@ -123,18 +137,12 @@ commit() {
             echo "$name is not installed?"
         fi
 
-        if [[ -d $TPM_DIR/$name ]]; then
-            if [[ -f $TPM_DIR/$name/.tpm.sh ]]; then
-                HACK_PKG=$name
-                . $TPM_DIR/$name/.tpm.sh
-                unset HACK_PKG
-            fi
-        fi
-
         for source in ${SOURCES["$name"]}; do
             source $TPM_DIR/$name/$source
         done
     done
+
+    loadPackageFoo
 
     # Make sure links are created
     for target in ${!LINKS[@]}; do
@@ -144,7 +152,6 @@ commit() {
 
         if [[ -f $TPM_DIR/$pkg/$source ]]; then
             if [[ ! -f $TPM_BIN/$target ]]; then
-                echo ln -s $TPM_DIR/$pkg/$source $TPM_BIN/$target
                 ln -s $TPM_DIR/$pkg/$source $TPM_BIN/$target
             fi
         fi
@@ -156,12 +163,7 @@ clean() {
     CLI=true
 
     . $HOME/.tpm.sh
-
-    for x in $TPM_DIR/*/.tpm.sh; do
-        HACK_PKG=$name
-        . $x
-        unset HACK_PKG
-    done
+    loadPackageFoo
 
     local extras=""
     for x in $TPM_DIR/*; do
