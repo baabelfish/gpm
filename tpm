@@ -116,6 +116,7 @@ buildPackage() {
 
 loadPackageFoo() {
     for x in $TPM_DIR/*/.tpm.sh; do
+        local name=$(basename $(dirname $x))
         HACK_PKG=$name
         . $x
         unset HACK_PKG
