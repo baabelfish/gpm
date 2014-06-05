@@ -32,12 +32,12 @@ githubify() {
 # $1 = Pkg name
 # $2 = file to source
 addSource() {
-    if [[ $HACK_PKG ]]; then
-        local name=$HACK_PKG
-        local source=$1
-    else
+    if [[ -z $HACK_PKG ]]; then
         local name=$1
         local source=$2
+    else
+        local name=$HACK_PKG
+        local source=$1
     fi
     SOURCES["$name"]="$source ${SOURCES["$name"]}"
 }
@@ -46,14 +46,14 @@ addSource() {
 # $2 = Target name
 # $3 = Source filename
 addBin() {
-    if [[ $HACK_PKG ]]; then
-        local name=$HACK_PKG
-        local target=$1
-        local source=$2
-    else
+    if [[ -z $HACK_PKG ]]; then
         local name=$1
         local target=$2
         local source=$3
+    else
+        local name=$HACK_PKG
+        local target=$1
+        local source=$2
     fi
     # Target name has to be unique (but package might have multiple links)
     # index by target name
@@ -63,12 +63,12 @@ addBin() {
 # $1 = Pkg name
 # $2 = Command
 build() {
-    if [[ $HACK_PKG ]]; then
-        local name=$HACK_PKG
-        local command=$1
-    else
+    if [[ -z $HACK_PKG ]]; then
         local name=$1
         local command=$2
+    else
+        local name=$HACK_PKG
+        local command=$1
     fi
     BUILD["$name"]="$command"
 }
@@ -92,7 +92,7 @@ installPackage() {
     git clone $(githubify $url) $TPM_DIR/$1
 
     local version=${VERSION["$1"]}
-    if [[ $version ]]; then
+    if [[ ! -z $version ]]; then
         cd $TPM_DIR/$1
         git checkout $version
     fi
@@ -108,7 +108,7 @@ updatePackage() {
 
 buildPackage() {
     local build_command=${BUILD["$1"]}
-    if [[ $build_command ]]; then
+    if [[ ! -z $build_command ]]; then
         cd $TPM_DIR/$1
         $build_command
     fi
@@ -124,7 +124,7 @@ loadPackageFoo() {
 }
 
 commit() {
-    if [[ $CLI ]]; then
+    if [[ ! -z $CLI ]]; then
         return
     fi
 
@@ -171,7 +171,7 @@ clean() {
         fi
     done
 
-    if [[ $extras ]] && confirm "Remove extra packages"; then
+    if [[ ! -z $extras ]] && confirm "Remove extra packages"; then
         rm -rf $extras
     fi
 
@@ -190,7 +190,7 @@ clean() {
         fi
     done
 
-    if [[ $extras ]] && confirm "Remove extra links"; then
+    if [[ ! -z $extras ]] && confirm "Remove extra links"; then
         rm -r $extras
     fi
 }
